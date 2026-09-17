@@ -11,30 +11,37 @@ data$sasdate <- as.Date(data$sasdate, format = "%m/%d/%Y")
 print(head(data))
 
 
-#Case 2 variables
-# INDPRO    = Industrial Production        transformation code = 5
-# CPIAUCSL  = CPI: All Items               transformation code = 6
-# FEDFUNDS  = Effective Federal Funds Rate transformation code = 2
+# Case 2 variables and transformation codes according to FRED-MD
+#INDPRO    = Industrial Production
+#transformation code = 5 (first difference of log)
+#CPIAUCSL  = CPI: All Items
+#transformation code = 6 (second difference of log)
+#FEDFUNDS  = Effective Federal Funds Rate
+#transformation code = 2 (first difference)
 
-Industrial_Production <- data$INDPRO
-Consumer_Price_Index <- data$CPIAUCSL
-Federal_Funds_Rate <- data$FEDFUNDS
+#I am not sure yet whether to transform the data
+#according to the codes
+#in the FRED-MD paper.
+
+industrial_production <- data$INDPRO
+consumer_price_index <- data$CPIAUCSL
+federal_funds_rate <- data$FEDFUNDS
 
 # Plot raw series
 
-plot(data$sasdate, Industrial_Production,
+plot(data$sasdate, industrial_production,
      type = "l",
      main = "Industrial Production",
      xlab = "Date",
      ylab = "INDPRO")
 
-plot(data$sasdate, Consumer_Price_Index,
+plot(data$sasdate, consumer_price_index,
      type = "l",
      main = "Consumer Price Index",
      xlab = "Date",
      ylab = "CPIAUCSL")
 
-plot(data$sasdate, Federal_Funds_Rate,
+plot(data$sasdate, federal_funds_rate,
      type = "l",
      main = "Federal Funds Rate",
      xlab = "Date",
