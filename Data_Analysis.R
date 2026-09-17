@@ -12,9 +12,9 @@ print(head(data))
 
 
 #Case 2 variables
-# INDPRO    = Industrial Production        tcode = 5
-# CPIAUCSL  = CPI: All Items               tcode = 6
-# FEDFUNDS  = Effective Federal Funds Rate tcode = 2
+# INDPRO    = Industrial Production        transformation code = 5
+# CPIAUCSL  = CPI: All Items               transformation code = 6
+# FEDFUNDS  = Effective Federal Funds Rate transformation code = 2
 
 Industrial_Production <- data$INDPRO
 Consumer_Price_Index <- data$CPIAUCSL
