@@ -92,3 +92,62 @@ plot(data$sasdate, log_consumer_price_index,
      main = "log(Consumer Price Index)",
      xlab = "Date",
      ylab = "log(CPI)")
+
+#Unit Root Test - Industrial Production
+
+IPd2<-boot_adf(diff(log_industrial_production), deterministics = "intercept")
+IPd2
+
+#p-value is <0.05 so we reject the null
+
+IPd1<-boot_adf(industrial_production, deterministics = "trend")
+IPd1
+#p-value is > 0.05 so we fail to reject the null. The series IP has a unit root is I(1)
+
+
+#Unit Root Test - Consumer Price Index
+CPId2<-boot_adf(diff(log_consumer_price_index), deterministics = "intercept")
+CPId2
+
+#p-value is >0.05 so we fail to reject the null. The series CPI has a unit root at I(2)
+
+#Unit Root Test - Fed Funds Rate 
+#test I(2)
+FEDd2<-boot_adf(diff(federal_funds_rate), deterministics = "intercept")
+FEDd2
+
+#p-value < 0.05 to reject the null 
+
+FEDd1<-boot_adf(federal_funds_rate, deterministics = "trend")
+FEDd1
+
+#p-value > 0.05 so we fail to reject the null. The series CPI has a unit root at I(1) 
+
+#We see that the differences correspond with the log transformations suggested in FRED-MD. 
+#We see that the series is indeed stationary after these series. 
+
+
+#Constructing the VAR model 
+#The new transformed variables 
+IP_dlog <- diff(log_industrial_production)
+CPI_d2log <-diff(diff(log_consumer_price_index))
+FED_d <-diff(federal_funds_rate)
+
+
+plot(tail(data$sasdate, length(IP_dlog)),IP_dlog,
+     type = "l",
+     main = "First Differenced Log of Industrial Production",
+     xlab = "Date",
+     ylab = "1st Diff Log Industrial Production")
+
+plot(tail(data$sasdate, length(CPI_d2log)),CPI_d2log,
+     type = "l",
+     main = "Second differenced Log of CPI",
+     xlab = "Date",
+     ylab = "2nd Diff Log(CPI)")
+
+plot(tail(data$sasdate, length(FED_d)), FED_d,
+     type = "l",
+     main = "First Differenced Federal Funds Rate",
+     xlab = "Date",
+     ylab = "1st Diff FEDFUNDS")
