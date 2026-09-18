@@ -7,6 +7,29 @@ data <- data[-1, ]
 
 # Convert date
 data$sasdate <- as.Date(data$sasdate, format = "%m/%d/%Y")
+range(data$sasdate)
+
+# Check whether our three variables are numeric
+str(data[, c("sasdate", "INDPRO", "CPIAUCSL", "FEDFUNDS")])
+
+# Count missing observations in each variable
+colSums(is.na(data[, c("INDPRO", "CPIAUCSL", "FEDFUNDS")]))
+
+# Check for repeated dates
+anyDuplicated(data$sasdate)
+tail(data[, c("sasdate", "INDPRO", "CPIAUCSL", "FEDFUNDS")])
+
+#We've verified that there are no missing observations, correct data types (all three economic variables are numeric) and that we have no duplicates.
+#checking for missing months:
+
+expected_dates <- seq.Date(
+  from = min(data$sasdate),
+  to = max(data$sasdate),
+  by = "month"
+)
+
+setdiff(expected_dates, data$sasdate)
+#numeric(0) -> no missing months (nice).
 
 print(head(data))
 
