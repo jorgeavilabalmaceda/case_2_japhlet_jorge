@@ -1,4 +1,4 @@
-data <- read.csv("data/2019-12.csv")
+data <- read.csv("data/2020-01.csv")
 
 print(head(data))
 
