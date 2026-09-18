@@ -42,9 +42,9 @@ print(head(data))
 #FEDFUNDS  = Effective Federal Funds Rate
 #transformation code = 2 (first difference)
 
-#I am not sure yet whether to transform the data
-#according to the codes
-#in the FRED-MD paper.
+#These transformation codes give us a hint
+#of which Model type could make the data stationary
+#We can verify this using a unit root test
 
 industrial_production <- data$INDPRO
 consumer_price_index <- data$CPIAUCSL
@@ -69,3 +69,26 @@ plot(data$sasdate, federal_funds_rate,
      main = "Federal Funds Rate",
      xlab = "Date",
      ylab = "FEDFUNDS")
+
+
+#Proposed Data Transformation
+#We take the log of industrial production and CPI so
+#that we can evaluate the percentage change in IP and CPI.
+#Taking the log changes the range of the graph
+#Federal Funds Rate we do not transform
+#since it is already in percentage form
+
+log_industrial_production <- log(industrial_production)
+log_consumer_price_index <- log(consumer_price_index)
+
+plot(data$sasdate,log_industrial_production,
+     type = "l",
+     main = "log(Industrial Production)",
+     xlab = "Date",
+     ylab = "log(IP)")
+
+plot(data$sasdate, log_consumer_price_index,
+     type = "l",
+     main = "log(Consumer Price Index)",
+     xlab = "Date",
+     ylab = "log(CPI)")
