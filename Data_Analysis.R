@@ -1,3 +1,5 @@
+install.packages("vars")
+library(vars)
 data <- read.csv("data/2020-02.csv")
 
 print(head(data))
@@ -43,8 +45,8 @@ print(head(data))
 #transformation code = 2 (first difference)
 
 #These transformation codes give us a hint
-#of which Model type could make the data stationary
-#We can verify this using a unit root test
+#of which transformation could make the data stationary
+#We verify this using a unit root test. See unit root series. 
 
 industrial_production <- data$INDPRO
 consumer_price_index <- data$CPIAUCSL
@@ -80,7 +82,10 @@ plot(data$sasdate, federal_funds_rate,
 
 log_industrial_production <- log(industrial_production)
 log_consumer_price_index <- log(consumer_price_index)
+length(log_consumer_price_index)
+length(log_industrial_production)
 
+(log)
 plot(data$sasdate,log_industrial_production,
      type = "l",
      main = "log(Industrial Production)",
@@ -94,60 +99,104 @@ plot(data$sasdate, log_consumer_price_index,
      ylab = "log(CPI)")
 
 #Unit Root Test - Industrial Production
+#Industrial Production. Set d=2
 
-IPd2<-boot_adf(diff(log_industrial_production), deterministics = "intercept")
+IPd2<-boot_adf(diff(diff(log_industrial_production)), deterministics = "intercept")
 IPd2
 
-#p-value is <0.05 so we reject the null
-
-IPd1<-boot_adf(industrial_production, deterministics = "trend")
+#p-value is 0<0.05 so we reject the null
+#Set d=1 and test again.
+IPd1<-boot_adf(diff(log_industrial_production), deterministics = "intercept")
 IPd1
-#p-value is > 0.05 so we fail to reject the null. The series IP has a unit root is I(1)
+
+#p-value is 0.001<0.05 so we reject the null
+#Set d=0 and test again.
+
+IPd0<-boot_adf(log_industrial_production, deterministics = "trend")
+IPd0
+#p-value is 0.69 > 0.05 so we fail to reject the null. The log(IP) series has a unit root at I(1)
 
 
 #Unit Root Test - Consumer Price Index
-CPId2<-boot_adf(diff(log_consumer_price_index), deterministics = "intercept")
+#Set d=2
+CPId2 <-boot_adf(diff(diff(log_consumer_price_index)), deterministics = "intercept")
 CPId2
 
-#p-value is >0.05 so we fail to reject the null. The series CPI has a unit root at I(2)
+#p-value is 0<0.05 so we reject the null.
+#set d=1 and test again
+
+CPId1 <-boot_adf(diff(log_consumer_price_index), deterministics = "intercept")
+CPId1
+#p-value is 0.04<0.05 so we reject the null. 
+
+CPId0 <-boot_adf(log_consumer_price_index, deterministics = "trend")
+CPId0
+
+#p-value is 0.83>0.05 so we fail to reject the null. The log(CPI) series has a unit root at I(1) 
+
 
 #Unit Root Test - Fed Funds Rate 
-#test I(2)
-FEDd2<-boot_adf(diff(federal_funds_rate), deterministics = "intercept")
+#Set d=2
+
+FEDd2<-boot_adf(diff(diff(federal_funds_rate)), deterministics = "intercept")
 FEDd2
+#p-value 0< 0.05 to reject the null 
+#Set d=1 and test again.
 
-#p-value < 0.05 to reject the null 
-
-FEDd1<-boot_adf(federal_funds_rate, deterministics = "trend")
+FEDd1<-boot_adf(diff(federal_funds_rate), deterministics = "intercept")
 FEDd1
 
-#p-value > 0.05 so we fail to reject the null. The series CPI has a unit root at I(1) 
+#p-value 0 < 0.05 to reject the null 
+#Set d=0 and test again.
+FEDd0 <-boot_adf(federal_funds_rate, deterministics = "trend")
+FEDd0
 
-#We see that the differences correspond with the log transformations suggested in FRED-MD. 
-#We see that the series is indeed stationary after these series. 
+#p-value 0.14> 0.05 so we fail to reject the null. The series CPI has a unit root at I(1) 
 
+#All the series become stationary after differencing once.
+#The transformation codes in FRED-MD suggested differencing Consumer Price Index twice. 
+#The unit-root tests indicate that a second difference is unnecessary, as the first-differenced log CPI is already stationary. 
 
 #Constructing the VAR model 
-#The new transformed variables 
+#The new transformed variables that result in stationary series 
 IP_dlog <- diff(log_industrial_production)
-CPI_d2log <-diff(diff(log_consumer_price_index))
+CPI_dlog <-diff(log_consumer_price_index)
 FED_d <-diff(federal_funds_rate)
 
 
-plot(tail(data$sasdate, length(IP_dlog)),IP_dlog,
+#We take data$sasdate[-1] in order to make the dates equal the series length. 
+#By differencing by order 1 we have lost one observation. 
+
+#Plotting the series to see the transformation. 
+
+plot(data$sasdate[-1],IP_dlog,
      type = "l",
      main = "First Differenced Log of Industrial Production",
      xlab = "Date",
      ylab = "1st Diff Log Industrial Production")
 
-plot(tail(data$sasdate, length(CPI_d2log)),CPI_d2log,
+plot(data$sasdate[-1],CPI_dlog,
      type = "l",
-     main = "Second differenced Log of CPI",
+     main = "First Differenced Log of CPI",
      xlab = "Date",
-     ylab = "2nd Diff Log(CPI)")
+     ylab = "1st Diff Log(CPI)")
 
-plot(tail(data$sasdate, length(FED_d)), FED_d,
+plot(data$sasdate[-1], FED_d,
      type = "l",
      main = "First Differenced Federal Funds Rate",
      xlab = "Date",
      ylab = "1st Diff FEDFUNDS")
+
+#VAR model selection using criterion 
+#Setup a dataframe run the VAR model select on 
+var_data <- data.frame(
+  IP = IP_dlog,
+  CPI = CPI_dlog,
+  FED = FED_d
+)
+
+#type constant because the series are stationary 
+VARselect(var_data,lag.max = 12, type="const")
+
+
+
