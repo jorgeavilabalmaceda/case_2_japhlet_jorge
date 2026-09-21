@@ -1,5 +1,7 @@
 install.packages("vars")
 library(vars)
+install.packages("bootUR")
+library(bootUR)
 data <- read.csv("data/2020-02.csv")
 
 print(head(data))
