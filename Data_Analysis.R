@@ -129,7 +129,7 @@ CPId2
 
 CPId1 <-boot_adf(diff(log_consumer_price_index), deterministics = "intercept")
 CPId1
-#p-value is 0.04<0.05 so we reject the null. 
+#p-value is 0.05753>0.05 so we fail to reject the null. -> Delta^2 log(CPI) series has a unit root at I(2)
 
 CPId0 <-boot_adf(log_consumer_price_index, deterministics = "trend")
 CPId0
