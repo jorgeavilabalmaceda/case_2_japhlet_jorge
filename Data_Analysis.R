@@ -158,66 +158,12 @@ FEDd0
 
 #p-value 0.14> 0.05 so we fail to reject the null. The series CPI has a unit root at I(1) 
 
-#Robustness Checking unit root tests
-
-#Industrial Production. Set d=2
-
-IPd2_check<-adf(diff(diff(log_industrial_production)), deterministics = "intercept")
-IPd2_check
-
-#p-value is 1e-04<0.05 so we reject the null
-#Set d=1 and test again.
-IPd1_check<-adf(diff(log_industrial_production), deterministics = "intercept")
-IPd1_check
-
-#p-value is 9.347e-09<0.05 so we reject the null
-#Set d=0 and test again.
-
-IPd0_check<-adf(log_industrial_production, deterministics = "trend")
-IPd0_check
-#p-value is 0.6887 > 0.05 so we fail to reject the null. The log(IP) series has a unit root at I(1)
-
-
-#Unit Root Test - Consumer Price Index
-#Set d=2
-CPId2_check <-adf(diff(diff(log_consumer_price_index)), deterministics = "intercept")
-CPId2_check
-
-#p-value is 8.175e-13<0.05 so we reject the null.
-#set d=1 and test again
-
-CPId1_check <-adf(diff(log_consumer_price_index), deterministics = "intercept")
-CPId1_check
-#p-value is 0.06725>0.05 so we fail to reject the null. -> Delta^2 log(CPI) series has a unit root at I(2)
-
-
-CPId0_check <-adf(log_consumer_price_index,deterministics = "trend")
-CPId0_check
-#p-value is  0.9127 >0.05 so we fail to reject the null -> series has a unit root at I(1)
-
-#Unit Root Test - Fed Funds Rate 
-#Set d=2
-
-FEDd2_check<-adf(diff(diff(federal_funds_rate)), deterministics = "intercept")
-FEDd2_check
-#p-value 4.023e-24< 0.05 to reject the null 
-#Set d=1 and test again.
-
-FEDd1_check<-adf(diff(federal_funds_rate), deterministics = "intercept")
-FEDd1_check
-
-#p-value 9.201e-12 < 0.05 to reject the null 
-#Set d=0 and test again.
-FEDd0_check <-adf(federal_funds_rate, deterministics = "trend")
-FEDd0_check
-
-#p-value  0.1017> 0.05 so we fail to reject the null. The series CPI has a unit root at I(1) 
 
 
 #Constructing the VAR model 
 #The new transformed variables that result in stationary series 
 IP_dlog <- diff(log_industrial_production)
-CPI_dlog <-diff(diff(log_consumer_price_index))
+CPI_dlog <-diff(log_consumer_price_index)
 FED_d <-diff(federal_funds_rate)
 
 
@@ -234,19 +180,19 @@ length(IP_dlog[-1])
 
 #Plotting the series to see the transformation. 
 
-plot(data$sasdate[-c(1,2)],IP_dlog[-1],
+plot(data$sasdate[-c(1,1)],IP_dlog,
      type = "l",
      main = "First Differenced Log of Industrial Production",
      xlab = "Date",
      ylab = "1st Diff Log Industrial Production")
 
-plot(data$sasdate[-c(1,2)],CPI_dlog,
+plot(data$sasdate[-c(1,1)],CPI_dlog,
      type = "l",
      main = "Second Differenced Log of CPI",
      xlab = "Date",
      ylab = "1st Diff Log(CPI)")
 
-plot(data$sasdate[-c(1,2)], FED_d[-1],
+plot(data$sasdate[-c(1,1)], FED_d,
      type = "l",
      main = "First Differenced Federal Funds Rate",
      xlab = "Date",
@@ -255,9 +201,9 @@ plot(data$sasdate[-c(1,2)], FED_d[-1],
 #VAR model selection using criterion 
 #Setup a dataframe run the VAR model select on 
 var_data <- data.frame(
-  IP = IP_dlog[-1],
+  IP = IP_dlog,
   CPI = CPI_dlog,
-  FED = FED_d[-1]
+  FED = FED_d
 )
 
 #type constant because the series are stationary 
