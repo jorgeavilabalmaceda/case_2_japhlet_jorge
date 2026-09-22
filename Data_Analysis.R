@@ -2,7 +2,11 @@ install.packages("vars")
 library(vars)
 install.packages("bootUR")
 library(bootUR)
+install.packages("urca")
+library(urca)
 data <- read.csv("data/2020-02.csv")
+
+set.seed(123)
 
 print(head(data))
 
@@ -87,7 +91,7 @@ log_consumer_price_index <- log(consumer_price_index)
 length(log_consumer_price_index)
 length(log_industrial_production)
 
-(log)
+
 plot(data$sasdate,log_industrial_production,
      type = "l",
      main = "log(Industrial Production)",
@@ -130,12 +134,12 @@ CPId2
 CPId1 <-boot_adf(diff(log_consumer_price_index), deterministics = "intercept")
 CPId1
 #p-value is 0.05753>0.05 so we fail to reject the null. -> Delta^2 log(CPI) series has a unit root at I(2)
+#p-value is 0.04802<0.05 so we reject the null. 
+#set d=1 and test again. 
 
-CPId0 <-boot_adf(log_consumer_price_index, deterministics = "trend")
+CPId0 <-boot_adf(log_consumer_price_index,deterministics = "trend")
 CPId0
-
-#p-value is 0.83>0.05 so we fail to reject the null. The log(CPI) series has a unit root at I(1) 
-
+#p-value is 0.860 >0.05 so we fail to reject the null -> series has a unit root at I(1)
 
 #Unit Root Test - Fed Funds Rate 
 #Set d=2
@@ -155,35 +159,44 @@ FEDd0
 
 #p-value 0.14> 0.05 so we fail to reject the null. The series CPI has a unit root at I(1) 
 
-#All the series become stationary after differencing once.
+#All the series become stationary after first differencing.
 #The transformation codes in FRED-MD suggested differencing Consumer Price Index twice. 
 #The unit-root tests indicate that a second difference is unnecessary, as the first-differenced log CPI is already stationary. 
+
 
 #Constructing the VAR model 
 #The new transformed variables that result in stationary series 
 IP_dlog <- diff(log_industrial_production)
-CPI_dlog <-diff(log_consumer_price_index)
+CPI_dlog <-diff(diff(log_consumer_price_index))
 FED_d <-diff(federal_funds_rate)
 
 
 #We take data$sasdate[-1] in order to make the dates equal the series length. 
 #By differencing by order 1 we have lost one observation. 
+length(data$sasdate)
+length(log_industrial_production)
+length(IP_dlog)
+length(CPI_dlog)
+length(FED_d)
+
+
+length(IP_dlog[-1])
 
 #Plotting the series to see the transformation. 
 
-plot(data$sasdate[-1],IP_dlog,
+plot(data$sasdate[-c(1,2)],IP_dlog[-1],
      type = "l",
      main = "First Differenced Log of Industrial Production",
      xlab = "Date",
      ylab = "1st Diff Log Industrial Production")
 
-plot(data$sasdate[-1],CPI_dlog,
+plot(data$sasdate[-c(1,2)],CPI_dlog,
      type = "l",
-     main = "First Differenced Log of CPI",
+     main = "Second Differenced Log of CPI",
      xlab = "Date",
      ylab = "1st Diff Log(CPI)")
 
-plot(data$sasdate[-1], FED_d,
+plot(data$sasdate[-c(1,2)], FED_d[-1],
      type = "l",
      main = "First Differenced Federal Funds Rate",
      xlab = "Date",
@@ -192,9 +205,9 @@ plot(data$sasdate[-1], FED_d,
 #VAR model selection using criterion 
 #Setup a dataframe run the VAR model select on 
 var_data <- data.frame(
-  IP = IP_dlog,
+  IP = IP_dlog[-1],
   CPI = CPI_dlog,
-  FED = FED_d
+  FED = FED_d[-1]
 )
 
 #type constant because the series are stationary 
