@@ -134,8 +134,7 @@ CPId2
 CPId1 <-boot_adf(diff(log_consumer_price_index), deterministics = "intercept")
 CPId1
 #p-value is 0.05753>0.05 so we fail to reject the null. -> Delta^2 log(CPI) series has a unit root at I(2)
-#p-value is 0.04802<0.05 so we reject the null. 
-#set d=1 and test again. 
+
 
 CPId0 <-boot_adf(log_consumer_price_index,deterministics = "trend")
 CPId0
@@ -159,9 +158,6 @@ FEDd0
 
 #p-value 0.14> 0.05 so we fail to reject the null. The series CPI has a unit root at I(1) 
 
-#All the series become stationary after first differencing.
-#The transformation codes in FRED-MD suggested differencing Consumer Price Index twice. 
-#The unit-root tests indicate that a second difference is unnecessary, as the first-differenced log CPI is already stationary. 
 
 
 #Constructing the VAR model 
