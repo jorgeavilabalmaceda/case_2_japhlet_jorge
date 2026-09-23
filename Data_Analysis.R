@@ -222,10 +222,13 @@ var13 <- VAR(var_data, p = 13, type = "const")
 var4  <- VAR(var_data, p = 4, type = "const")
 var2  <- VAR(var_data, p = 2, type = "const")
 
+#summary(var13)
+#summary(var4)
+summary(var2)
 
 #Plot residuals
-plot(residuals(var13))
-plot(residuals(var4))
+#plot(residuals(var13))
+#plot(residuals(var4))
 plot(residuals(var2))
 
 
@@ -239,12 +242,15 @@ bg_var4 <- serial.test(var4, lags.bg = 4, type = "BG")
 pt_var2 <- serial.test(var2, lags.pt = 16, type = "PT.asymptotic")
 bg_var2 <- serial.test(var2, lags.bg = 4, type = "BG")
 
+
 print(pt_var13)
 print(bg_var13)
 print(pt_var4)
 print(bg_var4)
 print(pt_var2)
 print(bg_var2)
+
+
 
 #Results:
 #VAR(13):Portmanteau p= 0.000574, BG p= 0.00163
@@ -339,7 +345,7 @@ summary(jo_test)
 # Restrict the sample to 1983–2019
 data_1983_2019 <- subset(
   data,
-  sasdate >= as.Date("1983-01-01") &
+  sasdate >= as.Date("1984-01-01") &
     sasdate <= as.Date("2020-01-01")
 )
 
@@ -437,4 +443,39 @@ FEDd0_1983_2019 <- boot_adf(
   deterministics = "trend"
 )
 FEDd0_1983_2019
+#p-value=0.23>0.05
+
+IP_subset <- diff(log_industrial_production_1983_2019)
+CPI_subset <- diff(log_consumer_price_index_1983_2019)
+FED_subset <- diff(federal_funds_rate_1983_2019)
+
+var_subset <-data.frame(
+  IP=IP_subset,
+  CPI=CPI_subset,
+  FED=FED_subset
+)
+
+VARselect(var_subset, lag.max = 36, type = "const")
+
+var5 <- VAR(var_data, p = 5, type = "const")
+var3  <- VAR(var_data, p = 3, type = "const")
+var1  <- VAR(var_data, p = 1, type = "const")
+
+pt_var5 <- serial.test(var5, lags.pt = 16, type = "PT.asymptotic")
+bg_var5 <- serial.test(var5, lags.bg = 4, type = "BG")
+
+pt_var3 <- serial.test(var3, lags.pt = 16, type = "PT.asymptotic")
+bg_var3 <- serial.test(var3, lags.bg = 4, type = "BG")
+
+pt_var1 <- serial.test(var1, lags.pt = 16, type = "PT.asymptotic")
+bg_var1 <- serial.test(var1, lags.bg = 4, type = "BG")
+
+
+print(pt_var5)
+print(bg_var5)
+print(pt_var3)
+print(bg_var3)
+print(pt_var1)
+print(bg_var1)
+
 
