@@ -244,38 +244,38 @@ plot(residuals(var2))
 
 #Test for serial correlation
 pt_var24 <-serial.test(var24,lags.pt=36,type="PT.adjusted")
-bg_var24 <- serial.test(var24, lags.bg = 4, type = "BG")
+bg_var24 <- serial.test(var24, lags.bg = 12, type = "BG")
 
 
 pt_var18 <- serial.test(var18, lags.pt = 24, type = "PT.adjusted")
-bg_var18 <- serial.test(var18, lags.bg = 4, type = "BG")
+bg_var18 <- serial.test(var18, lags.bg = 12, type = "BG")
 
 pt_var17 <- serial.test(var17, lags.pt = 24, type = "PT.adjusted")
-bg_var17 <- serial.test(var17, lags.bg = 4, type = "BG")
+bg_var17 <- serial.test(var17, lags.bg = 12, type = "BG")
 
 pt_var16 <- serial.test(var16, lags.pt = 24, type = "PT.adjusted")
-bg_var16 <- serial.test(var16, lags.bg = 4, type = "BG")
+bg_var16 <- serial.test(var16, lags.bg = 12, type = "BG")
 
 pt_var15 <- serial.test(var15, lags.pt = 24, type = "PT.adjusted")
-bg_var15 <- serial.test(var15, lags.bg = 4, type = "BG")
+bg_var15 <- serial.test(var15, lags.bg = 12, type = "BG")
 
 pt_var14 <- serial.test(var14, lags.pt = 24, type = "PT.adjusted")
-bg_var14 <- serial.test(var14, lags.bg = 4, type = "BG")
+bg_var14 <- serial.test(var14, lags.bg = 12, type = "BG")
 
 pt_var7 <- serial.test(var7, lags.pt = 24, type = "PT.adjusted")
-bg_var7 <- serial.test(var7, lags.bg = 4, type = "BG")
+bg_var7 <- serial.test(var7, lags.bg = 12, type = "BG")
 
 pt_var6 <- serial.test(var6, lags.pt = 24, type = "PT.adjusted")
-bg_var6 <- serial.test(var6, lags.bg = 4, type = "BG")
+bg_var6 <- serial.test(var6, lags.bg = 12, type = "BG")
 
 pt_var13 <- serial.test(var13, lags.pt = 16, type = "PT.adjusted")
-bg_var13 <- serial.test(var13, lags.bg = 4, type = "BG")
+bg_var13 <- serial.test(var13, lags.bg = 12, type = "BG")
 
 pt_var4 <- serial.test(var4, lags.pt = 16, type = "PT.adjusted")
-bg_var4 <- serial.test(var4, lags.bg = 4, type = "BG")
+bg_var4 <- serial.test(var4, lags.bg = 12, type = "BG")
 
 pt_var2 <- serial.test(var2, lags.pt = 16, type = "PT.adjusted")
-bg_var2 <- serial.test(var2, lags.bg = 4, type = "BG")
+bg_var2 <- serial.test(var2, lags.bg = 12, type = "BG")
 
 print(pt_var24)
 print(bg_var24)
@@ -400,3 +400,23 @@ pacf(residuals(var7)[, "CPI"],lag.max = 50)
 acf(residuals(var7)[, "IP"],lag.max = 50)
 pacf(residuals(var7)[, "IP"],lag.max = 50)
 
+
+
+#Granger Tests
+# Does FED cause IP?
+grangertest(IP ~ FED, order = 15, data = var_data)
+
+#no FED does not granger cause IP 
+# Does IP cause FED?
+grangertest(FED ~ IP, order = 15, data = var_data)
+# IP does granger cause FED
+
+# Does IP cause CPI?
+grangertest(CPI ~ IP, order = 15, data = var_data)
+#yes, IP does granger cause CPI
+# Does CPI cause FED?
+grangertest(FED ~ CPI, order = 15, data = var_data)
+#No, CPI does not granger cause FED
+# Does CPI cause IP?
+grangertest(IP ~ CPI, order = 15, data = var_data)
+#Yes CPI granger causes IP
