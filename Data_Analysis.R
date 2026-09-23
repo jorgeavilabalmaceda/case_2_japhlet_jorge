@@ -208,7 +208,7 @@ var_data <- data.frame(
 
 
 #Lag selection
-VARselect(var_data, lag.max = 36, type = "both")
+VARselect(var_data, lag.max = 36, type = "const")
 
 #Results:
 #AIC = 13 lags
@@ -218,13 +218,18 @@ VARselect(var_data, lag.max = 36, type = "both")
 
 
 #Estimate candidate VAR models
-var18<-VAR(var_data,p=18,type="both")
+var18<-VAR(var_data,p=18,type="const")
+var17<-VAR(var_data,p=17,type="const")
+var16<-VAR(var_data,p=16,type="const")
+var15<-VAR(var_data,p=15,type="const")
+var14<-VAR(var_data,p=14,type="const")
 
-var24<-VAR(var_data,p=24,type="both")
+var24<-VAR(var_data,p=24,type="const")
 
-var13 <- VAR(var_data, p = 13, type = "both")
-var4  <- VAR(var_data, p = 4, type = "both")
-var2  <- VAR(var_data, p = 2, type = "both")
+var13 <- VAR(var_data, p = 13, type = "const")
+var7<-VAR(var_data,p=7,type="const")
+var4  <- VAR(var_data, p = 4, type = "const")
+var2  <- VAR(var_data, p = 2, type = "const")
 
 #summary(var13)
 #summary(var4)
@@ -237,29 +242,64 @@ plot(residuals(var2))
 
 
 #Test for serial correlation
-pt_var24 <-serial.test(var24,lags.pt=24,type="PT.asymptotic")
+pt_var24 <-serial.test(var24,lags.pt=36,type="PT.adjusted")
 bg_var24 <- serial.test(var24, lags.bg = 4, type = "BG")
+
+
+pt_var18 <- serial.test(var18, lags.pt = 24, type = "PT.adjusted")
+bg_var18 <- serial.test(var18, lags.bg = 4, type = "BG")
+
+pt_var17 <- serial.test(var17, lags.pt = 24, type = "PT.adjusted")
+bg_var17 <- serial.test(var17, lags.bg = 4, type = "BG")
+
+pt_var16 <- serial.test(var16, lags.pt = 24, type = "PT.adjusted")
+bg_var16 <- serial.test(var16, lags.bg = 4, type = "BG")
+
+pt_var15 <- serial.test(var16, lags.pt = 24, type = "PT.adjusted")
+bg_var15 <- serial.test(var16, lags.bg = 4, type = "BG")
+
+pt_var14 <- serial.test(var16, lags.pt = 24, type = "PT.adjusted")
+bg_var14 <- serial.test(var16, lags.bg = 4, type = "BG")
+
+pt_var7 <- serial.test(var16, lags.pt = 24, type = "PT.adjusted")
+bg_var7 <- serial.test(var16, lags.bg = 4, type = "BG")
+
+pt_var13 <- serial.test(var13, lags.pt = 16, type = "PT.adjusted")
+bg_var13 <- serial.test(var13, lags.bg = 4, type = "BG")
+
+pt_var4 <- serial.test(var4, lags.pt = 16, type = "PT.adjusted")
+bg_var4 <- serial.test(var4, lags.bg = 4, type = "BG")
+
+pt_var2 <- serial.test(var2, lags.pt = 16, type = "PT.adjusted")
+bg_var2 <- serial.test(var2, lags.bg = 4, type = "BG")
+
 print(pt_var24)
 print(bg_var24)
 
-pt_var18 <- serial.test(var18, lags.pt = 18, type = "PT.asymptotic")
-bg_var18 <- serial.test(var18, lags.bg = 4, type = "BG")
-
-pt_var13 <- serial.test(var13, lags.pt = 16, type = "PT.asymptotic")
-bg_var13 <- serial.test(var13, lags.bg = 4, type = "BG")
-
-pt_var4 <- serial.test(var4, lags.pt = 16, type = "PT.asymptotic")
-bg_var4 <- serial.test(var4, lags.bg = 4, type = "BG")
-
-pt_var2 <- serial.test(var2, lags.pt = 16, type = "PT.asymptotic")
-bg_var2 <- serial.test(var2, lags.bg = 4, type = "BG")
-
 print(pt_var18)
 print(bg_var18)
+
+print(pt_var17)
+print(bg_var17)
+
+print(pt_var16)
+print(bg_var16)
+
+print(pt_var15)
+print(bg_var15)
+
+print(pt_var14)
+print(bg_var14)
+
 print(pt_var13)
 print(bg_var13)
+
+print(pt_var7)
+print(bg_var7)
+
 print(pt_var4)
 print(bg_var4)
+
 print(pt_var2)
 print(bg_var2)
 
@@ -279,10 +319,12 @@ print(bg_var2)
 roots(var13)
 roots(var4)
 roots(var2)
+roots(var7)
 
 plot(stability(var13))
 plot(stability(var4))
 plot(stability(var2))
+plot(stability(var7))
 
 #Results:
 #VAR(13): largest inverse root = 0.960
@@ -296,6 +338,7 @@ plot(stability(var2))
 normality.test(var13)
 normality.test(var4)
 normality.test(var2)
+normality.test(var7)
 
 #Results:
 #All three models reject multivariate normality (p < 2.2e-16).
@@ -306,9 +349,10 @@ normality.test(var2)
 arch.test(var13, lags.multi = 12)
 arch.test(var4, lags.multi = 12)
 arch.test(var2, lags.multi = 12)
+arch.test(var7, lags.multi = 12)
 
 #Results:
-# All three models reject the null of no ARCH effects (p < 2.2e-16).
+# All models tested reject the null of no ARCH effects (p < 2.2e-16).
 
 #Summary 
 #None of the candidate VAR models passes all diagnostics. 
@@ -325,6 +369,9 @@ pacf(residuals(var13)[, "CPI"],lag.max = 50)
 
 acf(residuals(var13)[, "FED"],lag.max = 50)
 pacf(residuals(var13)[, "FED"],lag.max = 50)
+
+acf(residuals(var7)[, "FED"],lag.max = 50)
+pacf(residuals(var7)[, "FED"],lag.max = 50)
 
 
 #Johansen cointegration test on the level variables to check if a VECM model is more effective
