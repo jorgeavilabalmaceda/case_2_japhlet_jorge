@@ -228,6 +228,7 @@ var24<-VAR(var_data,p=24,type="const")
 
 var13 <- VAR(var_data, p = 13, type = "const")
 var7<-VAR(var_data,p=7,type="const")
+var6<-VAR(var_data,p=6,type="const")
 var4  <- VAR(var_data, p = 4, type = "const")
 var2  <- VAR(var_data, p = 2, type = "const")
 
@@ -255,14 +256,17 @@ bg_var17 <- serial.test(var17, lags.bg = 4, type = "BG")
 pt_var16 <- serial.test(var16, lags.pt = 24, type = "PT.adjusted")
 bg_var16 <- serial.test(var16, lags.bg = 4, type = "BG")
 
-pt_var15 <- serial.test(var16, lags.pt = 24, type = "PT.adjusted")
-bg_var15 <- serial.test(var16, lags.bg = 4, type = "BG")
+pt_var15 <- serial.test(var15, lags.pt = 24, type = "PT.adjusted")
+bg_var15 <- serial.test(var15, lags.bg = 4, type = "BG")
 
-pt_var14 <- serial.test(var16, lags.pt = 24, type = "PT.adjusted")
-bg_var14 <- serial.test(var16, lags.bg = 4, type = "BG")
+pt_var14 <- serial.test(var14, lags.pt = 24, type = "PT.adjusted")
+bg_var14 <- serial.test(var14, lags.bg = 4, type = "BG")
 
-pt_var7 <- serial.test(var16, lags.pt = 24, type = "PT.adjusted")
-bg_var7 <- serial.test(var16, lags.bg = 4, type = "BG")
+pt_var7 <- serial.test(var7, lags.pt = 24, type = "PT.adjusted")
+bg_var7 <- serial.test(var7, lags.bg = 4, type = "BG")
+
+pt_var6 <- serial.test(var6, lags.pt = 24, type = "PT.adjusted")
+bg_var6 <- serial.test(var6, lags.bg = 4, type = "BG")
 
 pt_var13 <- serial.test(var13, lags.pt = 16, type = "PT.adjusted")
 bg_var13 <- serial.test(var13, lags.bg = 4, type = "BG")
@@ -284,8 +288,8 @@ print(bg_var17)
 
 print(pt_var16)
 print(bg_var16)
-
-print(pt_var15)
+#
+print(pt_var15) 
 print(bg_var15)
 
 print(pt_var14)
@@ -316,6 +320,8 @@ print(bg_var2)
 
 
 #Check stability
+roots(var16)
+roots(var15)
 roots(var13)
 roots(var4)
 roots(var2)
@@ -350,6 +356,8 @@ arch.test(var13, lags.multi = 12)
 arch.test(var4, lags.multi = 12)
 arch.test(var2, lags.multi = 12)
 arch.test(var7, lags.multi = 12)
+arch.test(var15, lags.multi = 12)
+arch.test(var16, lags.multi = 12)
 
 #Results:
 # All models tested reject the null of no ARCH effects (p < 2.2e-16).
@@ -360,7 +368,20 @@ arch.test(var7, lags.multi = 12)
 #The information criteria disagree on the appropriate lag length.
 
 
-#CHECKING ACF for potential lags that were missed 
+#CHECKING ACF for potential lags that were missed
+
+acf(residuals(var15)[, "IP"],lag.max = 50)
+pacf(residuals(var15)[, "IP"],lag.max = 50)
+
+acf(residuals(var15)[, "CPI"],lag.max = 50)
+pacf(residuals(var15)[, "CPI"],lag.max = 50)
+
+acf(residuals(var15)[, "FED"],lag.max = 50)
+pacf(residuals(var15)[, "FED"],lag.max = 50)
+
+
+
+
 acf(residuals(var13)[, "IP"],lag.max = 50)
 pacf(residuals(var13)[, "IP"],lag.max = 50)
 
@@ -373,179 +394,9 @@ pacf(residuals(var13)[, "FED"],lag.max = 50)
 acf(residuals(var7)[, "FED"],lag.max = 50)
 pacf(residuals(var7)[, "FED"],lag.max = 50)
 
+acf(residuals(var7)[, "CPI"],lag.max = 50)
+pacf(residuals(var7)[, "CPI"],lag.max = 50)
 
-#Johansen cointegration test on the level variables to check if a VECM model is more effective
-
-
-data_levels <- data.frame(
-  log_industrial_production,
-  log_consumer_price_index,
-  federal_funds_rate
-)
-
-jo_test <- ca.jo(
-  data_levels,
-  type = "trace",
-  ecdet = "const",
-  K = 12,
-  spec = "transitory"
-)
-
-summary(jo_test)
-
-#Results:
-#r=0:  reject at 5%
-#r<= 1: do not reject at 5%
-#r<=2: do not reject at 5%
-#
-#Cointegration rank = 1.
-# If all three level variables are I(1), this supports using a VECM.
-
-#working with a subset of the data
-# Restrict the sample to 1983–2019
-data_1983_2019 <- subset(
-  data,
-  sasdate >= as.Date("1984-01-01") &
-    sasdate <= as.Date("2020-01-01")
-)
-
-# Check the restricted sample
-range(data_1983_2019$sasdate)
-nrow(data_1983_2019)
-
-
-# Variables for the restricted sample
-
-industrial_production_1983_2019 <- data_1983_2019$INDPRO
-consumer_price_index_1983_2019 <- data_1983_2019$CPIAUCSL
-federal_funds_rate_1983_2019 <- data_1983_2019$FEDFUNDS
-
-
-# Log transformations
-
-log_industrial_production_1983_2019 <- log(industrial_production_1983_2019)
-log_consumer_price_index_1983_2019 <- log(consumer_price_index_1983_2019)
-
-
-# Unit Root Test - Industrial Production
-# Set d=2
-
-IPd2_1983_2019 <- boot_adf(
-  diff(diff(log_industrial_production_1983_2019)),
-  deterministics = "intercept"
-)
-IPd2_1983_2019
-#p=0<0.05 we reject the null
-# Set d=1 and test again
-
-IPd1_1983_2019 <- boot_adf(
-  diff(log_industrial_production_1983_2019),
-  deterministics = "intercept"
-)
-IPd1_1983_2019
-#p=0<0.04 we reject the null
-# Set d=0 and test again
-
-IPd0_1983_2019 <- boot_adf(
-  log_industrial_production_1983_2019,
-  deterministics = "trend"
-)
-IPd0_1983_2019
-#p=0.78>0.05 we fail to reject the null logIP has a unit root at I(1)
-
-# Unit Root Test - Consumer Price Index
-# Set d=2
-
-CPId2_1983_2019 <- boot_adf(
-  diff(diff(log_consumer_price_index_1983_2019)),
-  deterministics = "intercept"
-)
-CPId2_1983_2019
-#p=0<0.05
-# Set d=1 and test again
-
-CPId1_1983_2019 <- boot_adf(
-  diff(log_consumer_price_index_1983_2019),
-  deterministics = "intercept"
-)
-CPId1_1983_2019
-#p=0<0.05
-# Set d=0 and test again
-
-CPId0_1983_2019 <- boot_adf(
-  log_consumer_price_index_1983_2019,
-  deterministics = "trend"
-)
-CPId0_1983_2019
-#p=0.94>0.05 we fail to reject the null. LogCPI
-
-# Unit Root Test - Federal Funds Rate
-# Set d=2
-
-FEDd2_1983_2019 <- boot_adf(
-  diff(diff(federal_funds_rate_1983_2019)),
-  deterministics = "intercept"
-)
-FEDd2_1983_2019
-
-# Set d=1 and test again
-
-FEDd1_1983_2019 <- boot_adf(
-  diff(federal_funds_rate_1983_2019),
-  deterministics = "intercept"
-)
-FEDd1_1983_2019
-
-# Set d=0 and test again
-
-FEDd0_1983_2019 <- boot_adf(
-  federal_funds_rate_1983_2019,
-  deterministics = "trend"
-)
-FEDd0_1983_2019
-#p-value=0.23>0.05
-
-IP_subset <- diff(log_industrial_production_1983_2019)
-CPI_subset <- diff(log_consumer_price_index_1983_2019)
-FED_subset <- diff(federal_funds_rate_1983_2019)
-
-var_subset <-data.frame(
-  IP=IP_subset,
-  CPI=CPI_subset,
-  FED=FED_subset
-)
-
-VARselect(var_subset, lag.max = 36, type = "const")
-
-var5 <- VAR(var_subset, p = 5, type = "const")
-var3  <- VAR(var_subset, p = 3, type = "const")
-var1  <- VAR(var_subset, p = 1, type = "const")
-
-pt_var5 <- serial.test(var5, lags.pt = 16, type = "PT.asymptotic")
-bg_var5 <- serial.test(var5, lags.bg = 4, type = "BG")
-
-pt_var3 <- serial.test(var3, lags.pt = 16, type = "PT.asymptotic")
-bg_var3 <- serial.test(var3, lags.bg = 4, type = "BG")
-
-pt_var1 <- serial.test(var1, lags.pt = 16, type = "PT.asymptotic")
-bg_var1 <- serial.test(var1, lags.bg = 4, type = "BG")
-
-
-print(pt_var5)
-print(bg_var5)
-print(pt_var3)
-print(bg_var3)
-print(pt_var1)
-print(bg_var1)
-
-roots(var5)
-
-var5_whole <- VAR(var_data, p = 5, type = "const")
-pt_var5_whole <- serial.test(var5_whole, lags.pt = 16, type = "PT.asymptotic")
-bg_var5_whole <- serial.test(var5_whole, lags.bg = 4, type = "BG")
-
-print(pt_var5_whole)
-print(pt_var5_whole)
-
-
+acf(residuals(var7)[, "IP"],lag.max = 50)
+pacf(residuals(var7)[, "IP"],lag.max = 50)
 
