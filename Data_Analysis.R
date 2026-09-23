@@ -297,7 +297,7 @@ arch.test(var2, lags.multi = 12)
 #The information criteria disagree on the appropriate lag length.
 
 
-#CHECKING ACF 
+#CHECKING ACF for potential lags that were missed 
 acf(residuals(var13)[, "IP"],lag.max = 50)
 pacf(residuals(var13)[, "IP"],lag.max = 50)
 
@@ -306,7 +306,11 @@ pacf(residuals(var13)[, "CPI"],lag.max = 50)
 
 acf(residuals(var13)[, "FED"],lag.max = 50)
 pacf(residuals(var13)[, "FED"],lag.max = 50)
-#Johansen cointegration test on the level variables
+
+
+#Johansen cointegration test on the level variables to check if a VECM model is more effective
+
+
 data_levels <- data.frame(
   industrial_production,
   consumer_price_index,
@@ -330,4 +334,107 @@ summary(jo_test)
 #
 #Cointegration rank = 1.
 # If all three level variables are I(1), this supports using a VECM.
+
+#working with a subset of the data
+# Restrict the sample to 1983–2019
+data_1983_2019 <- subset(
+  data,
+  sasdate >= as.Date("1983-01-01") &
+    sasdate <= as.Date("2020-01-01")
+)
+
+# Check the restricted sample
+range(data_1983_2019$sasdate)
+nrow(data_1983_2019)
+
+
+# Variables for the restricted sample
+
+industrial_production_1983_2019 <- data_1983_2019$INDPRO
+consumer_price_index_1983_2019 <- data_1983_2019$CPIAUCSL
+federal_funds_rate_1983_2019 <- data_1983_2019$FEDFUNDS
+
+
+# Log transformations
+
+log_industrial_production_1983_2019 <- log(industrial_production_1983_2019)
+log_consumer_price_index_1983_2019 <- log(consumer_price_index_1983_2019)
+
+
+# Unit Root Test - Industrial Production
+# Set d=2
+
+IPd2_1983_2019 <- boot_adf(
+  diff(diff(log_industrial_production_1983_2019)),
+  deterministics = "intercept"
+)
+IPd2_1983_2019
+#p=0<0.05 we reject the null
+# Set d=1 and test again
+
+IPd1_1983_2019 <- boot_adf(
+  diff(log_industrial_production_1983_2019),
+  deterministics = "intercept"
+)
+IPd1_1983_2019
+#p=0<0.04 we reject the null
+# Set d=0 and test again
+
+IPd0_1983_2019 <- boot_adf(
+  log_industrial_production_1983_2019,
+  deterministics = "trend"
+)
+IPd0_1983_2019
+#p=0.78>0.05 we fail to reject the null logIP has a unit root at I(1)
+
+# Unit Root Test - Consumer Price Index
+# Set d=2
+
+CPId2_1983_2019 <- boot_adf(
+  diff(diff(log_consumer_price_index_1983_2019)),
+  deterministics = "intercept"
+)
+CPId2_1983_2019
+#p=0<0.05
+# Set d=1 and test again
+
+CPId1_1983_2019 <- boot_adf(
+  diff(log_consumer_price_index_1983_2019),
+  deterministics = "intercept"
+)
+CPId1_1983_2019
+#p=0<0.05
+# Set d=0 and test again
+
+CPId0_1983_2019 <- boot_adf(
+  log_consumer_price_index_1983_2019,
+  deterministics = "trend"
+)
+CPId0_1983_2019
+#p=0.94>0.05 we fail to reject the null. LogCPI
+
+# Unit Root Test - Federal Funds Rate
+# Set d=2
+
+FEDd2_1983_2019 <- boot_adf(
+  diff(diff(federal_funds_rate_1983_2019)),
+  deterministics = "intercept"
+)
+FEDd2_1983_2019
+
+# Set d=1 and test again
+
+FEDd1_1983_2019 <- boot_adf(
+  diff(federal_funds_rate_1983_2019),
+  deterministics = "intercept"
+)
+FEDd1_1983_2019
+
+# Set d=0 and test again
+
+FEDd0_1983_2019 <- boot_adf(
+  federal_funds_rate_1983_2019,
+  deterministics = "trend"
+)
+FEDd0_1983_2019
 
