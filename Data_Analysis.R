@@ -208,7 +208,7 @@ var_data <- data.frame(
 
 
 #Lag selection
-VARselect(var_data, lag.max = 36, type = "const")
+VARselect(var_data, lag.max = 36, type = "both")
 
 #Results:
 #AIC = 13 lags
@@ -218,9 +218,13 @@ VARselect(var_data, lag.max = 36, type = "const")
 
 
 #Estimate candidate VAR models
-var13 <- VAR(var_data, p = 13, type = "const")
-var4  <- VAR(var_data, p = 4, type = "const")
-var2  <- VAR(var_data, p = 2, type = "const")
+var18<-VAR(var_data,p=18,type="both")
+
+var24<-VAR(var_data,p=24,type="both")
+
+var13 <- VAR(var_data, p = 13, type = "both")
+var4  <- VAR(var_data, p = 4, type = "both")
+var2  <- VAR(var_data, p = 2, type = "both")
 
 #summary(var13)
 #summary(var4)
@@ -233,6 +237,14 @@ plot(residuals(var2))
 
 
 #Test for serial correlation
+pt_var24 <-serial.test(var24,lags.pt=24,type="PT.asymptotic")
+bg_var24 <- serial.test(var24, lags.bg = 4, type = "BG")
+print(pt_var24)
+print(bg_var24)
+
+pt_var18 <- serial.test(var18, lags.pt = 18, type = "PT.asymptotic")
+bg_var18 <- serial.test(var18, lags.bg = 4, type = "BG")
+
 pt_var13 <- serial.test(var13, lags.pt = 16, type = "PT.asymptotic")
 bg_var13 <- serial.test(var13, lags.bg = 4, type = "BG")
 
@@ -242,7 +254,8 @@ bg_var4 <- serial.test(var4, lags.bg = 4, type = "BG")
 pt_var2 <- serial.test(var2, lags.pt = 16, type = "PT.asymptotic")
 bg_var2 <- serial.test(var2, lags.bg = 4, type = "BG")
 
-
+print(pt_var18)
+print(bg_var18)
 print(pt_var13)
 print(bg_var13)
 print(pt_var4)
@@ -457,9 +470,9 @@ var_subset <-data.frame(
 
 VARselect(var_subset, lag.max = 36, type = "const")
 
-var5 <- VAR(var_data, p = 5, type = "const")
-var3  <- VAR(var_data, p = 3, type = "const")
-var1  <- VAR(var_data, p = 1, type = "const")
+var5 <- VAR(var_subset, p = 5, type = "const")
+var3  <- VAR(var_subset, p = 3, type = "const")
+var1  <- VAR(var_subset, p = 1, type = "const")
 
 pt_var5 <- serial.test(var5, lags.pt = 16, type = "PT.asymptotic")
 bg_var5 <- serial.test(var5, lags.bg = 4, type = "BG")
@@ -477,5 +490,15 @@ print(pt_var3)
 print(bg_var3)
 print(pt_var1)
 print(bg_var1)
+
+roots(var5)
+
+var5_whole <- VAR(var_data, p = 5, type = "const")
+pt_var5_whole <- serial.test(var5_whole, lags.pt = 16, type = "PT.asymptotic")
+bg_var5_whole <- serial.test(var5_whole, lags.bg = 4, type = "BG")
+
+print(pt_var5_whole)
+print(pt_var5_whole)
+
 
 
