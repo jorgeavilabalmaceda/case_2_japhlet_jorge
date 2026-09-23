@@ -318,8 +318,8 @@ pacf(residuals(var13)[, "FED"],lag.max = 50)
 
 
 data_levels <- data.frame(
-  industrial_production,
-  consumer_price_index,
+  log_industrial_production,
+  log_consumer_price_index,
   federal_funds_rate
 )
 
