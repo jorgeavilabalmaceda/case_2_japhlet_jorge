@@ -4,7 +4,7 @@ install.packages("bootUR")
 library(bootUR)
 install.packages("urca")
 library(urca)
-data <- read.csv("data/2020-02.csv")
+data <- read.csv("data/2020-01.csv")
 
 set.seed(123)
 
@@ -88,8 +88,8 @@ plot(data$sasdate, federal_funds_rate,
 
 log_industrial_production <- log(industrial_production)
 log_consumer_price_index <- log(consumer_price_index)
-length(log_consumer_price_index)
-length(log_industrial_production)
+
+
 
 
 plot(data$sasdate,log_industrial_production,
@@ -104,7 +104,11 @@ plot(data$sasdate, log_consumer_price_index,
      xlab = "Date",
      ylab = "log(CPI)")
 
-#Unit Root Test - Industrial Production
+#Unit Root Test.  We use the Pantula Principle to determine
+#by which order to difference our series by. We test dmax=2 en test the unit roots downwards. 
+#We stop at the first order where we fail to reject the null of a unit root and integrate by d+1. 
+
+#Industrial Production
 #Industrial Production. Set d=2
 
 IPd2<-boot_adf(diff(diff(log_industrial_production)), deterministics = "intercept")
@@ -153,22 +157,23 @@ FEDd1
 
 #p-value 0 < 0.05 to reject the null 
 #Set d=0 and test again.
-FEDd0 <-boot_adf(federal_funds_rate, deterministics = "trend")
+FEDd0 <-boot_adf(federal_funds_rate, deterministics = "none")
 FEDd0
 
-#p-value 0.12> 0.05 so we fail to reject the null. The series CPI has a unit root at I(1) 
+#p-value 0.19> 0.05 so we fail to reject the null. The series CPI has a unit root at I(1) 
 
 
 
 #Constructing the VAR model 
-#The new transformed variables that result in stationary series 
+#The new differenced variables that result in stationary series 
 IP_dlog <- diff(log_industrial_production)
 CPI_dlog <-diff(log_consumer_price_index)
 FED_d <-diff(federal_funds_rate)
 
 
+
 #We take data$sasdate[-1] in order to make the dates equal the series length. 
-#By differencing by order 1 we have lost one observation. 
+#By first differencing by order 1 we have lost one observation. 
 length(data$sasdate)
 length(log_industrial_production)
 length(IP_dlog)
@@ -177,7 +182,7 @@ length(FED_d)
 
 
 
-#Plotting the series to see the transformation. 
+#Plotting the series to see the transformation of the series. 
 
 plot(data$sasdate[-1],IP_dlog,
      type = "l",
@@ -207,6 +212,7 @@ var_data <- data.frame(
 
 
 
+
 #Lag selection
 VARselect(var_data, lag.max = 36, type = "const")
 
@@ -217,35 +223,241 @@ VARselect(var_data, lag.max = 36, type = "const")
 #FPE = 13 lags
 
 
-#Estimate candidate VAR models
-var18<-VAR(var_data,p=18,type="const")
-var17<-VAR(var_data,p=17,type="const")
-var16<-VAR(var_data,p=16,type="const")
-var15<-VAR(var_data,p=15,type="const")
+#Estimate candidate VAR models. We check the stability, and test for autocorrelation of the variables. 
+var13<-VAR(var_data,p=13,type="const")
+
+plot(residuals(var13))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var13,lags.pt=36,type="PT.adjusted")
+serial.test(var13, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var13)
+#unit roots ro<1. Therefore it is stable
+
+
+#We increase the lag by 1 and validate the model
 var14<-VAR(var_data,p=14,type="const")
 
+plot(residuals(var14))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var14,lags.pt=36,type="PT.adjusted")
+serial.test(var14, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var14)
+#unit roots ro<1. Therefore it is stable
+
+
+#We increase the lag by 1 and validate the model
+var15<-VAR(var_data,p=15,type="const")
+
+plot(residuals(var15))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var15,lags.pt=36,type="PT.adjusted")
+serial.test(var15, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var15)
+#unit roots ro<1. Therefore it is stable
+
+#We increase the lag by 1 and validate the model
+var16<-VAR(var_data,p=16,type="const")
+
+plot(residuals(var16))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var16,lags.pt=36,type="PT.adjusted")
+serial.test(var16, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var16)
+#unit roots ro<1. Therefore it is stable
+
+
+#We increase the lag by 1 and validate the model
+var17<-VAR(var_data,p=17,type="const")
+
+plot(residuals(var17))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var17,lags.pt=36,type="PT.adjusted")
+serial.test(var17, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var17)
+#unit roots ro<1. Therefore it is stable
+
+#We increase the lag by 1 and validate the model
+var18<-VAR(var_data,p=18,type="const")
+
+plot(residuals(var18))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var18,lags.pt=36,type="PT.adjusted")
+serial.test(var18, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var18)
+#unit roots ro<1. Therefore it is stable
+
+#We increase the lag by 1 and validate the model
+var19<-VAR(var_data,p=19,type="const")
+
+plot(residuals(var19))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var19,lags.pt=36,type="PT.adjusted")
+serial.test(var19, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var19)
+#unit roots ro<1. Therefore it is stable
+
+#We increase the lag by 1 and validate the model
+var20<-VAR(var_data,p=20,type="const")
+
+plot(residuals(var20))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var20,lags.pt=36,type="PT.adjusted")
+serial.test(var20, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var20)
+#unit roots ro<1. Therefore it is stable
+
+#We increase the lag by 1 and validate the model
+var21<-VAR(var_data,p=21,type="const")
+
+plot(residuals(var21))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var21,lags.pt=36,type="PT.adjusted")
+serial.test(var21, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var21)
+#unit roots ro<1. Therefore it is stable
+
+#We increase the lag by 1 and validate the model
+var22<-VAR(var_data,p=22,type="const")
+
+plot(residuals(var22))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var22,lags.pt=36,type="PT.adjusted")
+serial.test(var22, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var22)
+#unit roots ro<1. Therefore it is stable
+
+#We increase the lag by 1 and validate the model
+var23<-VAR(var_data,p=23,type="const")
+
+plot(residuals(var23))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var23,lags.pt=36,type="PT.adjusted")
+serial.test(var23, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var23)
+#unit roots ro<1. Therefore it is stable
+
+#We increase the lag by 1 and validate the model
 var24<-VAR(var_data,p=24,type="const")
 
-var13 <- VAR(var_data, p = 13, type = "const")
+plot(residuals(var24))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var24,lags.pt=36,type="PT.adjusted")
+serial.test(var24, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var24)
+#unit roots ro<1. Therefore it is stable
+
+
+
+
+
+#We increase the lag by 1 and validate the model
 var7<-VAR(var_data,p=7,type="const")
+
+plot(residuals(var7))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var7,lags.pt=36,type="PT.adjusted")
+serial.test(var7, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var7)
+#unit roots ro<1. Therefore it is stable
+
 var6<-VAR(var_data,p=6,type="const")
 var4  <- VAR(var_data, p = 4, type = "const")
+
+#We increase the lag by 1 and validate the model
+var4  <- VAR(var_data, p = 4, type = "const")
+
+plot(residuals(var4))
+
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var4,lags.pt=36,type="PT.adjusted")
+serial.test(var4, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var4)
+#unit roots ro<1. Therefore it is stable
+
 var2  <- VAR(var_data, p = 2, type = "const")
 
-#summary(var13)
-#summary(var4)
+summary(var13)
+summary(var4)
 summary(var2)
 
-#Plot residuals
-#plot(residuals(var13))
-#plot(residuals(var4))
-plot(residuals(var2))
 
 
 #Test for serial correlation
-pt_var24 <-serial.test(var24,lags.pt=36,type="PT.adjusted")
-bg_var24 <- serial.test(var24, lags.bg = 12, type = "BG")
-
+serial.test(var24,lags.pt=36,type="PT.adjusted")
+ serial.test(var24, lags.bg = 12, type = "BG")
+ 
+ serial.test(var24,lags.pt=36,type="PT.adjusted")
+ serial.test(var24, lags.bg = 12, type = "BG")
+ 
 
 pt_var18 <- serial.test(var18, lags.pt = 24, type = "PT.adjusted")
 bg_var18 <- serial.test(var18, lags.bg = 12, type = "BG")
@@ -277,46 +489,12 @@ bg_var4 <- serial.test(var4, lags.bg = 12, type = "BG")
 pt_var2 <- serial.test(var2, lags.pt = 16, type = "PT.adjusted")
 bg_var2 <- serial.test(var2, lags.bg = 12, type = "BG")
 
-print(pt_var24)
-print(bg_var24)
 
-print(pt_var18)
-print(bg_var18)
-
-print(pt_var17)
-print(bg_var17)
-
-print(pt_var16)
-print(bg_var16)
 #
-print(pt_var15) 
-print(bg_var15)
-
-print(pt_var14)
-print(bg_var14)
-
-print(pt_var13)
-print(bg_var13)
-
-print(pt_var7)
-print(bg_var7)
-
-print(pt_var4)
-print(bg_var4)
-
-print(pt_var2)
-print(bg_var2)
 
 
 
-#Results:
-#VAR(13):Portmanteau p= 0.000574, BG p= 0.00163
-#VAR(4):Portmanteau p< 0.001, BG p< 0.001
-#VAR(2):Portmanteau p< 0.001, BG p< 0.001
-#
-#All three models reject the null of no serial correlation.
-#VAR(13) has the weakest evidence of serial correlation,
-#but the residuals are still significantly autocorrelated.
+
 
 
 #Check stability
@@ -420,3 +598,7 @@ grangertest(FED ~ CPI, order = 15, data = var_data)
 # Does CPI cause IP?
 grangertest(IP ~ CPI, order = 15, data = var_data)
 #Yes CPI granger causes IP
+
+
+
+
