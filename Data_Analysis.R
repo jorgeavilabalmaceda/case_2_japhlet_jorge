@@ -280,7 +280,7 @@ print(pt_var13)
 print(pt_var2)
 print(pt_var4)
 
-#Check the behaviour of the residuals
+#Check the behaviour of the residuals of the 3 chosen models
 #VAR13
 acf(residuals(var13)[, "IP"],lag.max = 50)
 pacf(residuals(var13)[, "IP"],lag.max = 50)
@@ -323,370 +323,107 @@ arch.test(var4, lags.multi = 12)
 arch.test(var2, lags.multi = 12)
 
 
-
-
-
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var13,lags.pt=36,type="PT.adjusted")
-serial.test(var13, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var13)
-#unit roots ro<1. Therefore it is stable
-
-arch.test(var13, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-#We increase the lag by 1 and validate the model
-var14<-VAR(var_data,p=14,type="const")
-
-plot(residuals(var14))
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var14,lags.pt=36,type="PT.adjusted")
-serial.test(var14, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var14)
-#unit roots ro<1. Therefore it is stable
-
-arch.test(var14, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-#We increase the lag by 1 and validate the model
-var15<-VAR(var_data,p=15,type="const")
-
-plot(residuals(var15))
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var15,lags.pt=36,type="PT.adjusted")
-serial.test(var15, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-roots(var15)
-#unit roots ro<1. Therefore it is stable
-
-
-arch.test(var15, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-
-#We increase the lag by 1 and validate the model
-var16<-VAR(var_data,p=16,type="const")
-
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var16,lags.pt=36,type="PT.adjusted")
-serial.test(var16, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var16)
-#unit roots ro<1. Therefore it is stable
-
-
-arch.test(var16, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-#We increase the lag by 1 and validate the model
-var17<-VAR(var_data,p=17,type="const")
-
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var17,lags.pt=36,type="PT.adjusted")
-serial.test(var17, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var17)
-#unit roots ro<1. Therefore it is stable
-
-
-arch.test(var17, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-
-#We increase the lag by 1 and validate the model
-var18<-VAR(var_data,p=18,type="const")
-
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var18,lags.pt=36,type="PT.adjusted")
-serial.test(var18, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var18)
-#unit roots ro<1. Therefore it is stable
-
-
-arch.test(var18, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-
-#We increase the lag by 1 and validate the model
-var19<-VAR(var_data,p=19,type="const")
-
-plot(residuals(var19))
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var19,lags.pt=36,type="PT.adjusted")
-serial.test(var19, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var19)
-#unit roots ro<1. Therefore it is stable
-
-
-arch.test(var19, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-
-#We increase the lag by 1 and validate the model
-var20<-VAR(var_data,p=20,type="const")
-
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var20,lags.pt=36,type="PT.adjusted")
-serial.test(var20, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var20)
-#unit roots ro<1. Therefore it is stable
-
-#We increase the lag by 1 and validate the model
-var21<-VAR(var_data,p=21,type="const")
-
-plot(residuals(var21))
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var21,lags.pt=36,type="PT.adjusted")
-serial.test(var21, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var21)
-#unit roots ro<1. Therefore it is stable
-
-arch.test(var21, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-
-#We increase the lag by 1 and validate the model
-var22<-VAR(var_data,p=22,type="const")
-
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var22,lags.pt=36,type="PT.adjusted")
-serial.test(var22, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var22)
-#unit roots ro<1. Therefore it is stable
-
-
-arch.test(var22, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-
-#We increase the lag by 1 and validate the model
-var23<-VAR(var_data,p=23,type="const")
-
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var23,lags.pt=36,type="PT.adjusted")
-serial.test(var23, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var23)
-#unit roots ro<1. Therefore it is stable
-
-
-arch.test(var23, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-
-#We increase the lag by 1 and validate the model
-var24<-VAR(var_data,p=24,type="const")
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var24,lags.pt=36,type="PT.adjusted")
-serial.test(var24, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var24)
-#unit roots ro<1. Therefore it is stable
-
-
-arch.test(var24, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
+#Creating models from p=2 to 24
+
+var2<-VAR(var_data,p=2,type="const")
+var3<-VAR(var_data,p=3,type="const")
+var4<-VAR(var_data,p=4,type="const")
+var5<-VAR(var_data,p=5,type="const")
+var6<-VAR(var_data,p=6,type="const")
+var7<-VAR(var_data,p=7,type="const")
 var8<-VAR(var_data,p=8,type="const")
 var9<-VAR(var_data,p=9,type="const")
 var10<-VAR(var_data,p=10,type="const")
 var11<-VAR(var_data,p=11,type="const")
 var12<-VAR(var_data,p=12,type="const")
-
-
-var22<-VAR(var_data,p=22,type="const")#Testing the VAR model in the paper
-var7<-VAR(var_data,p=7,type="const")
-
-plot(residuals(var7))
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var7,lags.pt=36,type="PT.adjusted")
-serial.test(var7, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var7)
-#unit roots ro<1. Therefore it is stable
-
-arch.test(var7, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-var6<-VAR(var_data,p=6,type="const")
-var3<-VAR(var_data,p=3,type="const")
-
-
-var5<-VAR(var_data,p=22,type="const")
-
-
-
-#We increase the lag by 1 and validate the model
-var4  <- VAR(var_data, p = 4, type = "const")
-
-
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var4,lags.pt=36,type="PT.adjusted")
-serial.test(var4, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var4)
-#unit roots ro<1. Therefore it is stable
-
-
-arch.test(var4, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
-#Testing the VAR model recommended by BIC
-var2  <- VAR(var_data, p = 2, type = "const")
-
-#BG check short run autocorrelation and PT checks for long run autocorrelation 
-serial.test(var2,lags.pt=36,type="PT.adjusted")
-serial.test(var2, lags.bg = 12 , type = "BG")
-
-#In both tests we reject the null of no autocorrelation 
-
-
-roots(var2)
-#unit roots ro<1. Therefore it is stable
-
-
-arch.test(var2, lags.multi = 12)
-#we reject the null of heteroscedasticity 
-
+var13<-VAR(var_data,p=13,type="const")
+var14<-VAR(var_data,p=14,type="const")
+var15<-VAR(var_data,p=15,type="const")
+var16<-VAR(var_data,p=16,type="const")
+var17<-VAR(var_data,p=17,type="const")
+var18<-VAR(var_data,p=18,type="const")
+var19<-VAR(var_data,p=19,type="const")
+var20<-VAR(var_data,p=20,type="const")
+var21<-VAR(var_data,p=21,type="const")
+var22<-VAR(var_data,p=22,type="const")
+var23<-VAR(var_data,p=23,type="const")
+var24<-VAR(var_data,p=24,type="const")
 
 
 
 #Test for serial correlation
-pt_var24<-serial.test(var24,lags.pt=36,type="PT.adjusted")
-bg_var24<-serial.test(var24, lags.bg = 12, type = "BG")
 
+pt_var24<-serial.test(var24,lags.pt=36,type="PT.adjusted")
+bg_var24<-serial.test(var24,lags.bg=12,type="BG")
 
 pt_var23<-serial.test(var23,lags.pt=36,type="PT.adjusted")
-bg_var23<-serial.test(var23, lags.bg = 12, type = "BG")
+bg_var23<-serial.test(var23,lags.bg=12,type="BG")
 
 pt_var22<-serial.test(var22,lags.pt=36,type="PT.adjusted")
-bg_var22<-serial.test(var22, lags.bg = 12, type = "BG")
+bg_var22<-serial.test(var22,lags.bg=12,type="BG")
 
 pt_var21<-serial.test(var21,lags.pt=36,type="PT.adjusted")
-bg_var21<-serial.test(var21, lags.bg = 12, type = "BG")
+bg_var21<-serial.test(var21,lags.bg=12,type="BG")
 
-pt_var20<-serial.test(var24,lags.pt=36,type="PT.adjusted")
-bg_var20<-serial.test(var24, lags.bg = 12, type = "BG")
+pt_var20<-serial.test(var20,lags.pt=36,type="PT.adjusted")
+bg_var20<-serial.test(var20,lags.bg=12,type="BG")
 
-pt_var19<-serial.test(var24,lags.pt=36,type="PT.adjusted")
-bg_var19<-serial.test(var24, lags.bg = 12, type = "BG")
+pt_var19<-serial.test(var19,lags.pt=36,type="PT.adjusted")
+bg_var19<-serial.test(var19,lags.bg=12,type="BG")
 
-pt_var18 <- serial.test(var18, lags.pt = 24, type = "PT.adjusted")
-bg_var18 <- serial.test(var18, lags.bg = 12, type = "BG")
+pt_var18<-serial.test(var18,lags.pt=24,type="PT.adjusted")
+bg_var18<-serial.test(var18,lags.bg=12,type="BG")
 
-pt_var17 <- serial.test(var17, lags.pt = 24, type = "PT.adjusted")
-bg_var17 <- serial.test(var17, lags.bg = 12, type = "BG")
+pt_var17<-serial.test(var17,lags.pt=24,type="PT.adjusted")
+bg_var17<-serial.test(var17,lags.bg=12,type="BG")
 
-pt_var16 <- serial.test(var16, lags.pt = 24, type = "PT.adjusted")
-bg_var16 <- serial.test(var16, lags.bg = 12, type = "BG")
+pt_var16<-serial.test(var16,lags.pt=24,type="PT.adjusted")
+bg_var16<-serial.test(var16,lags.bg=12,type="BG")
 
-pt_var15 <- serial.test(var15, lags.pt = 24, type = "PT.adjusted")
-bg_var15 <- serial.test(var15, lags.bg = 12, type = "BG")
+pt_var15<-serial.test(var15,lags.pt=24,type="PT.adjusted")
+bg_var15<-serial.test(var15,lags.bg=12,type="BG")
 
-pt_var14 <- serial.test(var14, lags.pt = 24, type = "PT.adjusted")
-bg_var14 <- serial.test(var14, lags.bg = 12, type = "BG")
+pt_var14<-serial.test(var14,lags.pt=24,type="PT.adjusted")
+bg_var14<-serial.test(var14,lags.bg=12,type="BG")
 
-pt_var13 <- serial.test(var13, lags.pt = 16, type = "PT.adjusted")
-bg_var13 <- serial.test(var13, lags.bg = 12, type = "BG")
+pt_var13<-serial.test(var13,lags.pt=16,type="PT.adjusted")
+bg_var13<-serial.test(var13,lags.bg=12,type="BG")
 
-pt_var12 <- serial.test(var12,lags.pt=24,type="PT.adjusted")
-bg_var12 <- serial.test(var12,lags.bg=12,type="BG")
+pt_var12<-serial.test(var12,lags.pt=24,type="PT.adjusted")
+bg_var12<-serial.test(var12,lags.bg=12,type="BG")
+
+pt_var11<-serial.test(var11,lags.pt=24,type="PT.adjusted")
+bg_var11<-serial.test(var11,lags.bg=12,type="BG")
+
+pt_var10<-serial.test(var10,lags.pt=24,type="PT.adjusted")
+bg_var10<-serial.test(var10,lags.bg=12,type="BG")
+
+pt_var9<-serial.test(var9,lags.pt=24,type="PT.adjusted")
+bg_var9<-serial.test(var9,lags.bg=12,type="BG")
+
+pt_var8<-serial.test(var8,lags.pt=24,type="PT.adjusted")
+bg_var8<-serial.test(var8,lags.bg=12,type="BG")
+
+pt_var7<-serial.test(var7,lags.pt=24,type="PT.adjusted")
+bg_var7<-serial.test(var7,lags.bg=12,type="BG")
+
+pt_var6<-serial.test(var6,lags.pt=24,type="PT.adjusted")
+bg_var6<-serial.test(var6,lags.bg=12,type="BG")
+
+pt_var5<-serial.test(var5,lags.pt=24,type="PT.adjusted")
+bg_var5<-serial.test(var5,lags.bg=12,type="BG")
+
+pt_var4<-serial.test(var4,lags.pt=16,type="PT.adjusted")
+bg_var4<-serial.test(var4,lags.bg=12,type="BG")
+
+pt_var3<-serial.test(var3,lags.pt=16,type="PT.adjusted")
+bg_var3<-serial.test(var3,lags.bg=12,type="BG")
+
+pt_var2<-serial.test(var2,lags.pt=16,type="PT.adjusted")
+bg_var2<-serial.test(var2,lags.bg=12,type="BG")
 
 
-pt_var11 <- serial.test(var11,lags.pt=24,type="PT.adjusted")
-bg_var11 <- serial.test(var11,lags.bg=12,type="BG")
-
-pt_var10 <- serial.test(var10,lags.pt=24,type="PT.adjusted")
-bg_var10 <- serial.test(var10,lags.bg=12,type="BG")
-
-
-pt_var9 <- serial.test(var12,lags.pt=24,type="PT.adjusted")
-bg_var9 <- serial.test(var12,lags.bg=12,type="BG")
-
-
-pt_var8 <- serial.test(var12,lags.pt=24,type="PT.adjusted")
-bg_var8 <- serial.test(var12,lags.bg=12,type="BG")
-
-pt_var7 <- serial.test(var7, lags.pt = 24, type = "PT.adjusted")
-bg_var7 <- serial.test(var7, lags.bg = 12, type = "BG")
-
-pt_var6 <- serial.test(var6, lags.pt = 24, type = "PT.adjusted")
-bg_var6 <- serial.test(var6, lags.bg = 12, type = "BG")
-
-pt_var5 <- serial.test(var6, lags.pt = 24, type = "PT.adjusted")
-bg_var5 <- serial.test(var6, lags.bg = 12, type = "BG")
-
-pt_var4 <- serial.test(var4, lags.pt = 16, type = "PT.adjusted")
-bg_var4 <- serial.test(var4, lags.bg = 12, type = "BG")
-
-pt_var3 <- serial.test(var4, lags.pt = 16, type = "PT.adjusted")
-bg_var3 <- serial.test(var4, lags.bg = 12, type = "BG")
-
-pt_var2 <- serial.test(var2, lags.pt = 16, type = "PT.adjusted")
-bg_var2 <- serial.test(var2, lags.bg = 12, type = "BG")
-
+#Print results
 
 print(pt_var24)
 print(bg_var24)
@@ -757,61 +494,58 @@ print(bg_var3)
 print(pt_var2)
 print(bg_var2)
 
-bg_var13_4<-serial.test(var13, lags.bg = 4, type = "BG")
-bg_var14_4<-serial.test(var14, lags.bg = 4, type = "BG")
-bg_var2_4<-serial.test(var2, lags.bg = 4, type = "BG")
-print(bg_var13_4)
+
+# Additional BG tests at lag 4
+
+bg_var24_4<-serial.test(var24,lags.bg=4,type="BG")
+bg_var23_4<-serial.test(var23,lags.bg=4,type="BG")
+bg_var22_4<-serial.test(var22,lags.bg=4,type="BG")
+bg_var21_4<-serial.test(var21,lags.bg=4,type="BG")
+bg_var20_4<-serial.test(var20,lags.bg=4,type="BG")
+bg_var19_4<-serial.test(var19,lags.bg=4,type="BG")
+bg_var18_4<-serial.test(var18,lags.bg=4,type="BG")
+bg_var17_4<-serial.test(var17,lags.bg=4,type="BG")
+bg_var16_4<-serial.test(var16,lags.bg=4,type="BG")
+bg_var15_4<-serial.test(var15,lags.bg=4,type="BG")
+bg_var14_4<-serial.test(var14,lags.bg=4,type="BG")
+bg_var13_4<-serial.test(var13,lags.bg=4,type="BG")
+bg_var12_4<-serial.test(var12,lags.bg=4,type="BG")
+bg_var11_4<-serial.test(var11,lags.bg=4,type="BG")
+bg_var10_4<-serial.test(var10,lags.bg=4,type="BG")
+bg_var9_4<-serial.test(var9,lags.bg=4,type="BG")
+bg_var8_4<-serial.test(var8,lags.bg=4,type="BG")
+bg_var7_4<-serial.test(var7,lags.bg=4,type="BG")
+bg_var6_4<-serial.test(var6,lags.bg=4,type="BG")
+bg_var5_4<-serial.test(var5,lags.bg=4,type="BG")
+bg_var4_4<-serial.test(var4,lags.bg=4,type="BG")
+bg_var3_4<-serial.test(var3,lags.bg=4,type="BG")
+bg_var2_4<-serial.test(var2,lags.bg=4,type="BG")
+
+
+print(bg_var24_4)
+print(bg_var23_4)
+print(bg_var22_4)
+print(bg_var21_4)
+print(bg_var20_4)
+print(bg_var19_4)
+print(bg_var18_4)
+print(bg_var17_4)
+print(bg_var16_4)
+print(bg_var15_4)
 print(bg_var14_4)
+print(bg_var13_4)
+print(bg_var12_4)
+print(bg_var11_4)
+print(bg_var10_4)
+print(bg_var9_4)
+print(bg_var8_4)
+print(bg_var7_4)
+print(bg_var6_4)
+print(bg_var5_4)
+print(bg_var4_4)
+print(bg_var3_4)
 print(bg_var2_4)
 
-
-#Check stability
-roots(var16)
-roots(var15)
-roots(var13)
-roots(var4)
-roots(var2)
-roots(var7)
-
-plot(stability(var13))
-plot(stability(var4))
-plot(stability(var2))
-plot(stability(var7))
-
-#Results:
-#VAR(13): largest inverse root = 0.960
-#VAR(4):  largest inverse root = 0.863
-#VAR(2):  largest inverse root = 0.684
-#
-#All inverse roots are below 1, so all three models are stable.
-
-
-#Test for normality
-normality.test(var13)
-normality.test(var4)
-normality.test(var2)
-normality.test(var7)
-
-#Results:
-#All three models reject multivariate normality (p < 2.2e-16).
-#This is mainly driven by significant skewness and kurtosis.
-
-
-#Test for ARCH effects
-arch.test(var13, lags.multi = 12)
-arch.test(var4, lags.multi = 12)
-arch.test(var2, lags.multi = 12)
-arch.test(var7, lags.multi = 12)
-arch.test(var15, lags.multi = 12)
-arch.test(var16, lags.multi = 12)
-
-#Results:
-#All models tested reject the null of no ARCH effects (p < 2.2e-16).
-
-#Summary 
-#None of the candidate VAR models passes all diagnostics. 
-#However, all are stable, while VAR(13) has the weakest evidence of residual serial correlation. 
-#The information criteria disagree on the appropriate lag length.
 
 
 #CHECKING ACF for potential lags that were missed
@@ -824,7 +558,6 @@ pacf(residuals(var15)[, "CPI"],lag.max = 50)
 
 acf(residuals(var15)[, "FED"],lag.max = 50)
 pacf(residuals(var15)[, "FED"],lag.max = 50)
-
 
 acf(residuals(var13)[, "IP"],lag.max = 50)
 pacf(residuals(var13)[, "IP"],lag.max = 50)
@@ -848,7 +581,7 @@ pacf(residuals(var7)[, "IP"],lag.max = 50)
 #Null Hypothesis, past values of FED do not help predict future values of IP and/or CPI. 
 
 causality(var13,cause="FED")
-#p=0.003, means we reject the null. Coefficients of I(1) of FED are not zero int the I(1) of CPI and IP equations 
+#p=0.003, means we reject the null. Coefficients of I(1) of FED are not zero in the I(1) of CPI and IP equations 
 causality(var13,cause="IP")
 #p=0.003, means we reject the null. Coefficients of I(1) of log IP are not zero int the I(1) of log CPI and I(1) of FED equations 
 causality(var13,cause="CPI")
@@ -879,7 +612,25 @@ grangertest(CPI ~ FED, order=13, data=var_data)
 grangertest(IP ~ CPI, order = 13, data = var_data)
 #Yes CPI granger causes IP
 
+#IRF functions 
+# Shock: CPI
+irf_CPI_IP  <- irf(var13, impulse = "CPI", response = "IP",  n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
+irf_CPI_CPI <- irf(var13, impulse = "CPI", response = "CPI", n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
+irf_CPI_FED <- irf(var13, impulse = "CPI", response = "FED", n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
 
+# Shock: FED
+irf_FED_IP  <- irf(var13, impulse = "FED", response = "IP",  n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
+irf_FED_CPI <- irf(var13, impulse = "FED", response = "CPI", n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
+irf_FED_FED <- irf(var13, impulse = "FED", response = "FED", n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
 
+# Shock: IP
+irf_IP_IP  <- irf(var13, impulse = "IP", response = "IP",  n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
+irf_IP_CPI <- irf(var13, impulse = "IP", response = "CPI", n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
+irf_IP_FED <- irf(var13, impulse = "IP", response = "FED", n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
+
+# Plots
+plot(irf_CPI_IP);  plot(irf_CPI_CPI); plot(irf_CPI_FED)
+plot(irf_FED_IP);  plot(irf_FED_CPI); plot(irf_FED_FED)
+plot(irf_IP_IP);   plot(irf_IP_CPI);  plot(irf_IP_FED)
 
 
