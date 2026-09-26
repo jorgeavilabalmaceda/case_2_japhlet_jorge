@@ -223,10 +223,10 @@ VARselect(var_data, lag.max = 36, type = "const")
 #FPE = 13 lags
 
 
-#Estimate candidate VAR models. We check the stability, and test for autocorrelation of the variables. 
+#Estimate candidate VAR models. We check the stability, and test for autocorrelation and heteroscedasticity of the errors. 
 var13<-VAR(var_data,p=13,type="const")
 
-plot(residuals(var13))
+
 
 #BG check short run autocorrelation and PT checks for long run autocorrelation 
 serial.test(var13,lags.pt=36,type="PT.adjusted")
@@ -238,6 +238,8 @@ serial.test(var13, lags.bg = 12 , type = "BG")
 roots(var13)
 #unit roots ro<1. Therefore it is stable
 
+arch.test(var13, lags.multi = 12)
+#we reject the null of heteroscedasticity 
 
 #We increase the lag by 1 and validate the model
 var14<-VAR(var_data,p=14,type="const")
@@ -254,6 +256,8 @@ serial.test(var14, lags.bg = 12 , type = "BG")
 roots(var14)
 #unit roots ro<1. Therefore it is stable
 
+arch.test(var14, lags.multi = 12)
+#we reject the null of heteroscedasticity 
 
 #We increase the lag by 1 and validate the model
 var15<-VAR(var_data,p=15,type="const")
@@ -266,14 +270,17 @@ serial.test(var15, lags.bg = 12 , type = "BG")
 
 #In both tests we reject the null of no autocorrelation 
 
-
 roots(var15)
 #unit roots ro<1. Therefore it is stable
+
+
+arch.test(var15, lags.multi = 12)
+#we reject the null of heteroscedasticity 
+
 
 #We increase the lag by 1 and validate the model
 var16<-VAR(var_data,p=16,type="const")
 
-plot(residuals(var16))
 
 #BG check short run autocorrelation and PT checks for long run autocorrelation 
 serial.test(var16,lags.pt=36,type="PT.adjusted")
@@ -286,10 +293,12 @@ roots(var16)
 #unit roots ro<1. Therefore it is stable
 
 
+arch.test(var16, lags.multi = 12)
+#we reject the null of heteroscedasticity 
+
 #We increase the lag by 1 and validate the model
 var17<-VAR(var_data,p=17,type="const")
 
-plot(residuals(var17))
 
 #BG check short run autocorrelation and PT checks for long run autocorrelation 
 serial.test(var17,lags.pt=36,type="PT.adjusted")
@@ -301,10 +310,14 @@ serial.test(var17, lags.bg = 12 , type = "BG")
 roots(var17)
 #unit roots ro<1. Therefore it is stable
 
+
+arch.test(var17, lags.multi = 12)
+#we reject the null of heteroscedasticity 
+
+
 #We increase the lag by 1 and validate the model
 var18<-VAR(var_data,p=18,type="const")
 
-plot(residuals(var18))
 
 #BG check short run autocorrelation and PT checks for long run autocorrelation 
 serial.test(var18,lags.pt=36,type="PT.adjusted")
@@ -315,6 +328,11 @@ serial.test(var18, lags.bg = 12 , type = "BG")
 
 roots(var18)
 #unit roots ro<1. Therefore it is stable
+
+
+arch.test(var18, lags.multi = 12)
+#we reject the null of heteroscedasticity 
+
 
 #We increase the lag by 1 and validate the model
 var19<-VAR(var_data,p=19,type="const")
@@ -331,10 +349,14 @@ serial.test(var19, lags.bg = 12 , type = "BG")
 roots(var19)
 #unit roots ro<1. Therefore it is stable
 
+
+arch.test(var19, lags.multi = 12)
+#we reject the null of heteroscedasticity 
+
+
 #We increase the lag by 1 and validate the model
 var20<-VAR(var_data,p=20,type="const")
 
-plot(residuals(var20))
 
 #BG check short run autocorrelation and PT checks for long run autocorrelation 
 serial.test(var20,lags.pt=36,type="PT.adjusted")
@@ -361,10 +383,13 @@ serial.test(var21, lags.bg = 12 , type = "BG")
 roots(var21)
 #unit roots ro<1. Therefore it is stable
 
+arch.test(var21, lags.multi = 12)
+#we reject the null of heteroscedasticity 
+
+
 #We increase the lag by 1 and validate the model
 var22<-VAR(var_data,p=22,type="const")
 
-plot(residuals(var22))
 
 #BG check short run autocorrelation and PT checks for long run autocorrelation 
 serial.test(var22,lags.pt=36,type="PT.adjusted")
@@ -376,10 +401,14 @@ serial.test(var22, lags.bg = 12 , type = "BG")
 roots(var22)
 #unit roots ro<1. Therefore it is stable
 
+
+arch.test(var22, lags.multi = 12)
+#we reject the null of heteroscedasticity 
+
+
 #We increase the lag by 1 and validate the model
 var23<-VAR(var_data,p=23,type="const")
 
-plot(residuals(var23))
 
 #BG check short run autocorrelation and PT checks for long run autocorrelation 
 serial.test(var23,lags.pt=36,type="PT.adjusted")
@@ -391,10 +420,13 @@ serial.test(var23, lags.bg = 12 , type = "BG")
 roots(var23)
 #unit roots ro<1. Therefore it is stable
 
+
+arch.test(var23, lags.multi = 12)
+#we reject the null of heteroscedasticity 
+
+
 #We increase the lag by 1 and validate the model
 var24<-VAR(var_data,p=24,type="const")
-
-plot(residuals(var24))
 
 #BG check short run autocorrelation and PT checks for long run autocorrelation 
 serial.test(var24,lags.pt=36,type="PT.adjusted")
@@ -407,10 +439,13 @@ roots(var24)
 #unit roots ro<1. Therefore it is stable
 
 
+arch.test(var24, lags.multi = 12)
+#we reject the null of heteroscedasticity 
 
 
 
-#We increase the lag by 1 and validate the model
+
+#Testing the VAR model in the paper
 var7<-VAR(var_data,p=7,type="const")
 
 plot(residuals(var7))
@@ -425,13 +460,16 @@ serial.test(var7, lags.bg = 12 , type = "BG")
 roots(var7)
 #unit roots ro<1. Therefore it is stable
 
-var6<-VAR(var_data,p=6,type="const")
-var4  <- VAR(var_data, p = 4, type = "const")
+arch.test(var7, lags.multi = 12)
+#we reject the null of heteroscedasticity 
+
+
+
 
 #We increase the lag by 1 and validate the model
 var4  <- VAR(var_data, p = 4, type = "const")
 
-plot(residuals(var4))
+
 
 #BG check short run autocorrelation and PT checks for long run autocorrelation 
 serial.test(var4,lags.pt=36,type="PT.adjusted")
@@ -443,11 +481,27 @@ serial.test(var4, lags.bg = 12 , type = "BG")
 roots(var4)
 #unit roots ro<1. Therefore it is stable
 
+
+arch.test(var4, lags.multi = 12)
+#we reject the null of heteroscedasticity 
+
+#Testing the VAR model recommended by BIC
 var2  <- VAR(var_data, p = 2, type = "const")
 
-summary(var13)
-summary(var4)
-summary(var2)
+#BG check short run autocorrelation and PT checks for long run autocorrelation 
+serial.test(var2,lags.pt=36,type="PT.adjusted")
+serial.test(var2, lags.bg = 12 , type = "BG")
+
+#In both tests we reject the null of no autocorrelation 
+
+
+roots(var2)
+#unit roots ro<1. Therefore it is stable
+
+
+arch.test(var2, lags.multi = 12)
+#we reject the null of heteroscedasticity 
+
 
 
 
@@ -538,7 +592,7 @@ arch.test(var15, lags.multi = 12)
 arch.test(var16, lags.multi = 12)
 
 #Results:
-# All models tested reject the null of no ARCH effects (p < 2.2e-16).
+#All models tested reject the null of no ARCH effects (p < 2.2e-16).
 
 #Summary 
 #None of the candidate VAR models passes all diagnostics. 
@@ -556,8 +610,6 @@ pacf(residuals(var15)[, "CPI"],lag.max = 50)
 
 acf(residuals(var15)[, "FED"],lag.max = 50)
 pacf(residuals(var15)[, "FED"],lag.max = 50)
-
-
 
 
 acf(residuals(var13)[, "IP"],lag.max = 50)
@@ -578,25 +630,39 @@ pacf(residuals(var7)[, "CPI"],lag.max = 50)
 acf(residuals(var7)[, "IP"],lag.max = 50)
 pacf(residuals(var7)[, "IP"],lag.max = 50)
 
+#Granger test in the var package causality()
+#Null Hypothesis, past values of FED do not help predict future values of IP and/or CPI. 
 
+causality(var13,cause="FED")
+#p=0.003, means we reject the null. Coefficients of I(1) of FED are not zero int the I(1) of CPI and IP equations 
+causality(var13,cause="IP")
+#p=0.003, means we reject the null. Coefficients of I(1) of log IP are not zero int the I(1) of log CPI and I(1) of FED equations 
+causality(var13,cause="CPI")
+#p=0.5, means we fail to reject the null. Coefficients of first difference of Log of CPI are zero in the IP and FED equations 
 
 #Granger Tests
-# Does FED cause IP?
-grangertest(IP ~ FED, order = 15, data = var_data)
+#H0:X does not Granger cause Y
+#If X granger causes Y we mean that past values of X
+#help predict future values of Y better than only past values of Y can. 
 
-#no FED does not granger cause IP 
+# Does FED cause IP?
+grangertest(IP ~ FED, order = 13, data = var_data)
+#No, FED does not granger cause IP 
+
 # Does IP cause FED?
-grangertest(FED ~ IP, order = 15, data = var_data)
-# IP does granger cause FED
+grangertest(FED ~ IP, order = 13, data = var_data)
+# IP, does granger cause FED
 
 # Does IP cause CPI?
-grangertest(CPI ~ IP, order = 15, data = var_data)
+grangertest(CPI ~ IP, order = 13, data = var_data)
 #yes, IP does granger cause CPI
 # Does CPI cause FED?
-grangertest(FED ~ CPI, order = 15, data = var_data)
+grangertest(FED ~ CPI, order = 13, data = var_data)
 #No, CPI does not granger cause FED
+
+grangertest(CPI ~ FED, order=13, data=var_data)
 # Does CPI cause IP?
-grangertest(IP ~ CPI, order = 15, data = var_data)
+grangertest(IP ~ CPI, order = 13, data = var_data)
 #Yes CPI granger causes IP
 
 
