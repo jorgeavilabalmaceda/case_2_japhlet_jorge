@@ -782,3 +782,5 @@ grangertest(IP ~ CPI, order = 13, data = var_data)
 
 
 
+
+
