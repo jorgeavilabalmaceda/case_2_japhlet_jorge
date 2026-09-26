@@ -1,4 +1,6 @@
 install.packages("vars")
+install.packages("tseries")
+library("tseries")
 library(vars)
 install.packages("bootUR")
 library(bootUR)
@@ -170,6 +172,11 @@ IP_dlog <- diff(log_industrial_production)
 CPI_dlog <-diff(log_consumer_price_index)
 FED_d <-diff(federal_funds_rate)
 
+#Check stationarity of the series using the ADF test
+boot_adf(IP_dlog)
+boot_adf(CPI_dlog)
+boot_adf(FED_d)
+
 
 
 #We take data$sasdate[-1] in order to make the dates equal the series length. 
@@ -225,6 +232,98 @@ VARselect(var_data, lag.max = 36, type = "const")
 
 #Estimate candidate VAR models. We check the stability, and test for autocorrelation and heteroscedasticity of the errors. 
 var13<-VAR(var_data,p=13,type="const")
+var2<-VAR(var_data, p=2, type="const")
+var4<-VAR(var_data,p=4,type="const")
+
+summary(var13)
+summary(var2)
+summary(var4)
+
+
+#Diagnostics checks
+
+#Checking stability 
+roots(var13)
+roots(var2)
+roots(var4)
+
+
+#Breusch -Godfrey test to test for serial autocorrelation.
+#BG tests for long run correlation. 
+#Null Hypothesis - no autocorrelation in the residuals.
+bg_var13<-serial.test(var13, lags.bg = 12 , type = "BG")
+bg_var13_4<-serial.test(var13, lags.bg = 4 , type = "BG")
+
+bg_var2<-serial.test(var2,lags.bg = 12,type="BG")
+bg_var2_4<-serial.test(var2,lags.bg = 4,type="BG")
+
+bg_var4<-serial.test(var4,lags.bg=12,type="BG")
+bg_var4_4<-serial.test(var4,lags.bg=12,type="BG")
+
+print(bg_var13)
+print(bg_var13_4)
+print(bg_var2)
+print(bg_var2_4)
+print(bg_var2)
+print(bg_var2_4)
+
+
+
+# Portmanteau test for serial autocorrelation for long run variance.
+# Null Hypothesis - no autocorrelation in the residuals.
+
+pt_var13 <- serial.test(var13, lags.pt = 36, type = "PT.asymptotic")
+pt_var2 <- serial.test(var2, lags.pt = 36, type = "PT.asymptotic")
+pt_var4 <- serial.test(var4, lags.pt = 36, type = "PT.asymptotic")
+
+print(pt_var13)
+print(pt_var2)
+print(pt_var4)
+
+#Check the behaviour of the residuals
+#VAR13
+acf(residuals(var13)[, "IP"],lag.max = 50)
+pacf(residuals(var13)[, "IP"],lag.max = 50)
+
+acf(residuals(var13)[, "CPI"],lag.max = 50)
+pacf(residuals(var13)[, "CPI"],lag.max = 50)
+
+acf(residuals(var13)[, "FED"],lag.max = 50)
+pacf(residuals(var13)[, "FED"],lag.max = 50)
+
+#VAR4
+acf(residuals(var4)[, "IP"],lag.max = 50)
+pacf(residuals(var4)[, "IP"],lag.max = 50)
+
+acf(residuals(var4)[, "CPI"],lag.max = 50)
+pacf(residuals(var4)[, "CPI"],lag.max = 50)
+
+acf(residuals(var4)[, "FED"],lag.max = 50)
+pacf(residuals(var4)[, "FED"],lag.max = 50)
+
+#VAR2
+acf(residuals(var2)[, "IP"],lag.max = 50)
+pacf(residuals(var2)[, "IP"],lag.max = 50)
+
+acf(residuals(var2)[, "CPI"],lag.max = 50)
+pacf(residuals(var2)[, "CPI"],lag.max = 50)
+
+acf(residuals(var2)[, "FED"],lag.max = 50)
+pacf(residuals(var2)[, "FED"],lag.max = 50)
+
+
+#Checking stability 
+roots(var13)
+roots(var2)
+roots(var4)
+
+#check for heteroscedasticity 
+arch.test(var13, lags.multi = 12)
+arch.test(var4, lags.multi = 12)
+arch.test(var2, lags.multi = 12)
+
+
+
 
 
 
