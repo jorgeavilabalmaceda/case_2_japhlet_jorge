@@ -506,12 +506,23 @@ arch.test(var2, lags.multi = 12)
 
 
 #Test for serial correlation
-serial.test(var24,lags.pt=36,type="PT.adjusted")
- serial.test(var24, lags.bg = 12, type = "BG")
- 
- serial.test(var24,lags.pt=36,type="PT.adjusted")
- serial.test(var24, lags.bg = 12, type = "BG")
- 
+pt_var24<-serial.test(var24,lags.pt=36,type="PT.adjusted")
+pt_var24<-serial.test(var24, lags.bg = 12, type = "BG")
+
+pt_var23<-serial.test(var23,lags.pt=36,type="PT.adjusted")
+pt_var23<-serial.test(var23, lags.bg = 12, type = "BG")
+
+pt_var22<-serial.test(var22,lags.pt=36,type="PT.adjusted")
+pt_var22<-serial.test(var22, lags.bg = 12, type = "BG")
+
+pt_var21<-serial.test(var21,lags.pt=36,type="PT.adjusted")
+pt_var21<-serial.test(var21, lags.bg = 12, type = "BG")
+
+pt_var20<-serial.test(var24,lags.pt=36,type="PT.adjusted")
+pt_var20<-serial.test(var24, lags.bg = 12, type = "BG")
+
+pt_var19<-serial.test(var24,lags.pt=36,type="PT.adjusted")
+pt_var19<-serial.test(var24, lags.bg = 12, type = "BG")
 
 pt_var18 <- serial.test(var18, lags.pt = 24, type = "PT.adjusted")
 bg_var18 <- serial.test(var18, lags.bg = 12, type = "BG")
@@ -528,25 +539,96 @@ bg_var15 <- serial.test(var15, lags.bg = 12, type = "BG")
 pt_var14 <- serial.test(var14, lags.pt = 24, type = "PT.adjusted")
 bg_var14 <- serial.test(var14, lags.bg = 12, type = "BG")
 
+pt_var13 <- serial.test(var13, lags.pt = 16, type = "PT.adjusted")
+bg_var13 <- serial.test(var13, lags.bg = 12, type = "BG")
+
 pt_var7 <- serial.test(var7, lags.pt = 24, type = "PT.adjusted")
 bg_var7 <- serial.test(var7, lags.bg = 12, type = "BG")
 
 pt_var6 <- serial.test(var6, lags.pt = 24, type = "PT.adjusted")
 bg_var6 <- serial.test(var6, lags.bg = 12, type = "BG")
 
-pt_var13 <- serial.test(var13, lags.pt = 16, type = "PT.adjusted")
-bg_var13 <- serial.test(var13, lags.bg = 12, type = "BG")
+pt_var5 <- serial.test(var6, lags.pt = 24, type = "PT.adjusted")
+bg_var5 <- serial.test(var6, lags.bg = 12, type = "BG")
 
 pt_var4 <- serial.test(var4, lags.pt = 16, type = "PT.adjusted")
 bg_var4 <- serial.test(var4, lags.bg = 12, type = "BG")
+
+pt_var3 <- serial.test(var4, lags.pt = 16, type = "PT.adjusted")
+bg_var3 <- serial.test(var4, lags.bg = 12, type = "BG")
 
 pt_var2 <- serial.test(var2, lags.pt = 16, type = "PT.adjusted")
 bg_var2 <- serial.test(var2, lags.bg = 12, type = "BG")
 
 
-#
+print(pt_var24)
+print(bg_var24)
 
+print(pt_var23)
+print(bg_var23)
 
+print(pt_var22)
+print(bg_var22)
+
+print(pt_var21)
+print(bg_var21)
+
+print(pt_var20)
+print(bg_var20)
+
+print(pt_var19)
+print(bg_var19)
+
+print(pt_var18)
+print(bg_var18)
+
+print(pt_var17)
+print(bg_var17)
+
+print(pt_var16)
+print(bg_var16)
+
+print(pt_var15)
+print(bg_var15)
+
+print(pt_var14)
+print(bg_var14)
+
+print(pt_var13)
+print(bg_var13)
+
+print(pt_var12)
+print(bg_var12)
+
+print(pt_var11)
+print(bg_var11)
+
+print(pt_var10)
+print(bg_var10)
+
+print(pt_var09)
+print(bg_var09)
+
+print(pt_var08)
+print(bg_var08)
+
+print(pt_var07)
+print(bg_var07)
+
+print(pt_var06)
+print(bg_var06)
+
+print(pt_var05)
+print(bg_var05)
+
+print(pt_var04)
+print(bg_var04)
+
+print(pt_var03)
+print(bg_var03)
+
+print(pt_var02)
+print(bg_var02)
 
 
 
