@@ -442,10 +442,14 @@ roots(var24)
 arch.test(var24, lags.multi = 12)
 #we reject the null of heteroscedasticity 
 
+var8<-VAR(var_data,p=8,type="const")
+var9<-VAR(var_data,p=9,type="const")
+var10<-VAR(var_data,p=10,type="const")
+var11<-VAR(var_data,p=11,type="const")
+var12<-VAR(var_data,p=12,type="const")
 
 
-
-#Testing the VAR model in the paper
+var22<-VAR(var_data,p=22,type="const")#Testing the VAR model in the paper
 var7<-VAR(var_data,p=7,type="const")
 
 plot(residuals(var7))
@@ -463,6 +467,11 @@ roots(var7)
 arch.test(var7, lags.multi = 12)
 #we reject the null of heteroscedasticity 
 
+var6<-VAR(var_data,p=6,type="const")
+var3<-VAR(var_data,p=3,type="const")
+
+
+var5<-VAR(var_data,p=22,type="const")
 
 
 
@@ -606,29 +615,29 @@ print(bg_var11)
 print(pt_var10)
 print(bg_var10)
 
-print(pt_var09)
-print(bg_var09)
+print(pt_var9)
+print(bg_var9)
 
-print(pt_var08)
-print(bg_var08)
+print(pt_var8)
+print(bg_var8)
 
-print(pt_var07)
-print(bg_var07)
+print(pt_var7)
+print(bg_var7)
 
-print(pt_var06)
-print(bg_var06)
+print(pt_var6)
+print(bg_var6)
 
-print(pt_var05)
-print(bg_var05)
+print(pt_var5)
+print(bg_var5)
 
-print(pt_var04)
-print(bg_var04)
+print(pt_var4)
+print(bg_var4)
 
-print(pt_var03)
-print(bg_var03)
+print(pt_var3)
+print(bg_var3)
 
-print(pt_var02)
-print(bg_var02)
+print(pt_var2)
+print(bg_var2)
 
 
 
@@ -746,7 +755,6 @@ grangertest(CPI ~ FED, order=13, data=var_data)
 # Does CPI cause IP?
 grangertest(IP ~ CPI, order = 13, data = var_data)
 #Yes CPI granger causes IP
-
 
 
 
