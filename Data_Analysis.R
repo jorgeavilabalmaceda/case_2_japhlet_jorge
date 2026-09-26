@@ -518,6 +518,7 @@ arch.test(var2, lags.multi = 12)
 pt_var24<-serial.test(var24,lags.pt=36,type="PT.adjusted")
 bg_var24<-serial.test(var24, lags.bg = 12, type = "BG")
 
+
 pt_var23<-serial.test(var23,lags.pt=36,type="PT.adjusted")
 bg_var23<-serial.test(var23, lags.bg = 12, type = "BG")
 
@@ -657,7 +658,12 @@ print(bg_var3)
 print(pt_var2)
 print(bg_var2)
 
-
+bg_var13_4<-serial.test(var13, lags.bg = 4, type = "BG")
+bg_var14_4<-serial.test(var14, lags.bg = 4, type = "BG")
+bg_var2_4<-serial.test(var2, lags.bg = 4, type = "BG")
+print(bg_var13_4)
+print(bg_var14_4)
+print(bg_var2_4)
 
 
 #Check stability
