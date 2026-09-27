@@ -223,6 +223,8 @@ var_data <- data.frame(
 #Lag selection
 VARselect(var_data, lag.max = 36, type = "const")
 
+VARselect(var_data, lag.max = 36, type = "both")
+
 #Results:
 #AIC = 13 lags
 #HQ  = 4 lags
@@ -233,6 +235,10 @@ VARselect(var_data, lag.max = 36, type = "const")
 #Estimate candidate VAR models. We check the stability, and test for autocorrelation and heteroscedasticity of the errors. 
 var13<-VAR(var_data,p=13,type="const")
 var2<-VAR(var_data, p=2, type="const")
+var4<-VAR(var_data,p=4,type="const")
+
+var13<-VAR(var_data,p=13,type="both")
+var2<-VAR(var_data, p=2, type="both")
 var4<-VAR(var_data,p=4,type="const")
 
 summary(var13)
