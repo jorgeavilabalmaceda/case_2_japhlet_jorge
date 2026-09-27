@@ -1,10 +1,10 @@
 install.packages("vars")
 install.packages("tseries")
+install.packages("urca")
+install.packages("bootUR")
 library("tseries")
 library(vars)
-install.packages("bootUR")
 library(bootUR)
-install.packages("urca")
 library(urca)
 data <- read.csv("data/2020-01.csv")
 
