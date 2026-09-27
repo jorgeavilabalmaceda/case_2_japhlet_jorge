@@ -223,8 +223,6 @@ var_data <- data.frame(
 #Lag selection
 VARselect(var_data, lag.max = 36, type = "const")
 
-VARselect(var_data, lag.max = 36, type = "both")
-
 #Results:
 #AIC = 13 lags
 #HQ  = 4 lags
@@ -237,9 +235,6 @@ var13<-VAR(var_data,p=13,type="const")
 var2<-VAR(var_data, p=2, type="const")
 var4<-VAR(var_data,p=4,type="const")
 
-var13<-VAR(var_data,p=13,type="both")
-var2<-VAR(var_data, p=2, type="both")
-var4<-VAR(var_data,p=4,type="const")
 
 summary(var13)
 summary(var2)
@@ -288,34 +283,34 @@ print(pt_var4)
 
 #Check the behaviour of the residuals of the 3 chosen models
 #VAR13
-acf(residuals(var13)[, "IP"],lag.max = 50)
-pacf(residuals(var13)[, "IP"],lag.max = 50)
+acf(residuals(var13)[, "IP"],lag.max = 24)
+pacf(residuals(var13)[, "IP"],lag.max = 24)
 
-acf(residuals(var13)[, "CPI"],lag.max = 50)
-pacf(residuals(var13)[, "CPI"],lag.max = 50)
+acf(residuals(var13)[, "CPI"],lag.max = 24)
+pacf(residuals(var13)[, "CPI"],lag.max = 24)
 
-acf(residuals(var13)[, "FED"],lag.max = 50)
-pacf(residuals(var13)[, "FED"],lag.max = 50)
+acf(residuals(var13)[, "FED"],lag.max = 24)
+pacf(residuals(var13)[, "FED"],lag.max = 24)
 
 #VAR4
-acf(residuals(var4)[, "IP"],lag.max = 50)
-pacf(residuals(var4)[, "IP"],lag.max = 50)
+acf(residuals(var4)[, "IP"],lag.max = 24)
+pacf(residuals(var4)[, "IP"],lag.max = 24)
 
-acf(residuals(var4)[, "CPI"],lag.max = 50)
-pacf(residuals(var4)[, "CPI"],lag.max = 50)
+acf(residuals(var4)[, "CPI"],lag.max = 24)
+pacf(residuals(var4)[, "CPI"],lag.max = 24)
 
-acf(residuals(var4)[, "FED"],lag.max = 50)
-pacf(residuals(var4)[, "FED"],lag.max = 50)
+acf(residuals(var4)[, "FED"],lag.max = 24)
+pacf(residuals(var4)[, "FED"],lag.max = 24)
 
 #VAR2
-acf(residuals(var2)[, "IP"],lag.max = 50)
-pacf(residuals(var2)[, "IP"],lag.max = 50)
+acf(residuals(var2)[, "IP"],lag.max = 24)
+pacf(residuals(var2)[, "IP"],lag.max = 24)
 
-acf(residuals(var2)[, "CPI"],lag.max = 50)
-pacf(residuals(var2)[, "CPI"],lag.max = 50)
+acf(residuals(var2)[, "CPI"],lag.max = 24)
+pacf(residuals(var2)[, "CPI"],lag.max = 24)
 
-acf(residuals(var2)[, "FED"],lag.max = 50)
-pacf(residuals(var2)[, "FED"],lag.max = 50)
+acf(residuals(var2)[, "FED"],lag.max = 24)
+pacf(residuals(var2)[, "FED"],lag.max = 24)
 
 
 #Checking stability 
@@ -556,32 +551,32 @@ print(bg_var2_4)
 
 #CHECKING ACF for potential lags that were missed
 
-acf(residuals(var15)[, "IP"],lag.max = 50)
-pacf(residuals(var15)[, "IP"],lag.max = 50)
+acf(residuals(var15)[, "IP"],lag.max = 24)
+pacf(residuals(var15)[, "IP"],lag.max = 24)
 
-acf(residuals(var15)[, "CPI"],lag.max = 50)
-pacf(residuals(var15)[, "CPI"],lag.max = 50)
+acf(residuals(var15)[, "CPI"],lag.max = 24)
+pacf(residuals(var15)[, "CPI"],lag.max = 24)
 
-acf(residuals(var15)[, "FED"],lag.max = 50)
-pacf(residuals(var15)[, "FED"],lag.max = 50)
+acf(residuals(var15)[, "FED"],lag.max = 24)
+pacf(residuals(var15)[, "FED"],lag.max = 24)
 
-acf(residuals(var13)[, "IP"],lag.max = 50)
-pacf(residuals(var13)[, "IP"],lag.max = 50)
+acf(residuals(var13)[, "IP"],lag.max = 24)
+pacf(residuals(var13)[, "IP"],lag.max = 24)
 
-acf(residuals(var13)[, "CPI"],lag.max = 50)
-pacf(residuals(var13)[, "CPI"],lag.max = 50)
+acf(residuals(var13)[, "CPI"],lag.max = 24)
+pacf(residuals(var13)[, "CPI"],lag.max = 24)
 
-acf(residuals(var13)[, "FED"],lag.max = 50)
-pacf(residuals(var13)[, "FED"],lag.max = 50)
+acf(residuals(var13)[, "FED"],lag.max = 24)
+pacf(residuals(var13)[, "FED"],lag.max = 24)
 
-acf(residuals(var7)[, "FED"],lag.max = 50)
-pacf(residuals(var7)[, "FED"],lag.max = 50)
+acf(residuals(var7)[, "FED"],lag.max = 24)
+pacf(residuals(var7)[, "FED"],lag.max = 24)
 
-acf(residuals(var7)[, "CPI"],lag.max = 50)
-pacf(residuals(var7)[, "CPI"],lag.max = 50)
+acf(residuals(var7)[, "CPI"],lag.max = 24)
+pacf(residuals(var7)[, "CPI"],lag.max = 24)
 
-acf(residuals(var7)[, "IP"],lag.max = 50)
-pacf(residuals(var7)[, "IP"],lag.max = 50)
+acf(residuals(var7)[, "IP"],lag.max = 24)
+pacf(residuals(var7)[, "IP"],lag.max = 24)
 
 #Granger test in the var package causality()
 #Null Hypothesis, past values of FED do not help predict future values of IP and/or CPI. 
@@ -638,5 +633,6 @@ irf_IP_FED <- irf(var13, impulse = "IP", response = "FED", n.ahead = 24, boot = 
 plot(irf_CPI_IP);  plot(irf_CPI_CPI); plot(irf_CPI_FED)
 plot(irf_FED_IP);  plot(irf_FED_CPI); plot(irf_FED_FED)
 plot(irf_IP_IP);   plot(irf_IP_CPI);  plot(irf_IP_FED)
+
 
 
