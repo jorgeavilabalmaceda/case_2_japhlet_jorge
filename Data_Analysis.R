@@ -613,6 +613,62 @@ grangertest(CPI ~ FED, order=13, data=var_data)
 grangertest(IP ~ CPI, order = 13, data = var_data)
 #Yes CPI granger causes IP
 
+install.packages("car")
+library(car)
+
+# FED -> IP
+FED_to_IP <- linearHypothesis(
+  var13$varresult$IP,
+  paste0("FED.l", 1:13, " = 0"),
+  test = "F"
+)
+
+# IP -> FED
+IP_to_FED <- linearHypothesis(
+  var13$varresult$FED,
+  paste0("IP.l", 1:13, " = 0"),
+  test = "F"
+)
+
+# IP -> CPI
+IP_to_CPI <- linearHypothesis(
+  var13$varresult$CPI,
+  paste0("IP.l", 1:13, " = 0"),
+  test = "F"
+)
+
+# CPI -> IP
+CPI_to_IP <- linearHypothesis(
+  var13$varresult$IP,
+  paste0("CPI.l", 1:13, " = 0"),
+  test = "F"
+)
+
+# FED -> CPI
+FED_to_CPI <- linearHypothesis(
+  var13$varresult$CPI,
+  paste0("FED.l", 1:13, " = 0"),
+  test = "F"
+)
+
+# CPI -> FED
+CPI_to_FED <- linearHypothesis(
+  var13$varresult$FED,
+  paste0("CPI.l", 1:13, " = 0"),
+  test = "F"
+)
+
+FED_to_IP
+IP_to_FED
+IP_to_CPI
+CPI_to_IP
+FED_to_CPI
+CPI_to_FED
+
+
+
+
+
 #IRF functions 
 # Shock: CPI
 irf_CPI_IP  <- irf(var13, impulse = "CPI", response = "IP",  n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
