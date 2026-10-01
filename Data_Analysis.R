@@ -1,7 +1,3 @@
-install.packages("vars")
-install.packages("tseries")
-install.packages("urca")
-install.packages("bootUR")
 library("tseries")
 library(vars)
 library(bootUR)
@@ -627,7 +623,7 @@ FED_to_IP <- linearHypothesis(
 IP_to_FED <- linearHypothesis(
   var13$varresult$FED,
   paste0("IP.l", 1:13, " = 0"),
-  test = "F"
+  test = "F",
 )
 
 # IP -> CPI
