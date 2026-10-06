@@ -611,6 +611,7 @@ grangertest(IP ~ CPI, order = 13, data = var_data)
 
 install.packages("car")
 library(car)
+#We run a hypothesis test to see directional granger relationships
 
 # FED -> IP
 FED_to_IP <- linearHypothesis(
@@ -685,6 +686,71 @@ irf_IP_FED <- irf(var13, impulse = "IP", response = "FED", n.ahead = 24, boot = 
 plot(irf_CPI_IP);  plot(irf_CPI_CPI); plot(irf_CPI_FED)
 plot(irf_FED_IP);  plot(irf_FED_CPI); plot(irf_FED_FED)
 plot(irf_IP_IP);   plot(irf_IP_CPI);  plot(irf_IP_FED)
+
+
+# IRF functions — cumulative (levels)
+#To get the level IRFs from the differenced ones we need to accumulate the impulse responses
+#since diff(yt) = yt-yt-1 so why yt = yt-1 + diff(yt)
+
+# Shock: CPI
+irf_CPI_IP_level  <- irf(var13, impulse = "CPI", response = "IP",
+                         n.ahead = 24, boot = TRUE, ortho = FALSE,
+                         runs = 1000, cumulative = TRUE)
+
+irf_CPI_CPI_level <- irf(var13, impulse = "CPI", response = "CPI",
+                         n.ahead = 24, boot = TRUE, ortho = FALSE,
+                         runs = 1000, cumulative = TRUE)
+
+irf_CPI_FED_level <- irf(var13, impulse = "CPI", response = "FED",
+                         n.ahead = 24, boot = TRUE, ortho = FALSE,
+                         runs = 1000, cumulative = TRUE)
+
+
+# Shock: FED
+irf_FED_IP_level  <- irf(var13, impulse = "FED", response = "IP",
+                         n.ahead = 24, boot = TRUE, ortho = FALSE,
+                         runs = 1000, cumulative = TRUE)
+
+irf_FED_CPI_level <- irf(var13, impulse = "FED", response = "CPI",
+                         n.ahead = 24, boot = TRUE, ortho = FALSE,
+                         runs = 1000, cumulative = TRUE)
+
+irf_FED_FED_level <- irf(var13, impulse = "FED", response = "FED",
+                         n.ahead = 24, boot = TRUE, ortho = FALSE,
+                         runs = 1000, cumulative = TRUE)
+
+
+# Shock: IP
+irf_IP_IP_level  <- irf(var13, impulse = "IP", response = "IP",
+                        n.ahead = 24, boot = TRUE, ortho = FALSE,
+                        runs = 1000, cumulative = TRUE)
+
+irf_IP_CPI_level <- irf(var13, impulse = "IP", response = "CPI",
+                        n.ahead = 24, boot = TRUE, ortho = FALSE,
+                        runs = 1000, cumulative = TRUE)
+
+irf_IP_FED_level <- irf(var13, impulse = "IP", response = "FED",
+                        n.ahead = 24, boot = TRUE, ortho = FALSE,
+                        runs = 1000, cumulative = TRUE)
+
+
+#this has bugs the cumulative irfs 
+plot(irf_CPI_IP_level,  main = "CPI → IP")
+plot(irf_CPI_CPI_level, main = "CPI → CPI")
+plot(irf_CPI_FED_level, main = "CPI → FED")
+
+plot(irf_FED_IP_level,  main = "FED → IP")
+plot(irf_FED_CPI_level, main = "FED → CPI")
+plot(irf_FED_FED_level, main = "FED → FED")
+
+plot(irf_IP_IP_level,   main = "IP → IP")
+plot(irf_IP_CPI_level,  main = "IP → CPI")
+plot(irf_IP_FED_level,  main = "IP → FED")
+
+
+
+
+
 
 
 
