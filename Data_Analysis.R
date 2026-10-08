@@ -807,30 +807,25 @@ var_data_alt <- data.frame(
   CPI = CPI_dlog
 )
 
-# Same lag length and deterministic terms as the baseline
-var13_alt <- VAR(var_data_alt, p = 13, type = "const")
+library(svars)
 
-svar_alt <- SVAR(var13_alt, estmethod = "direct", Bmat = Bmat)
+svar_alt <- id.chol(var13_base, order_k = c("FED", "IP", "CPI"))
 svar_alt$B
 
 set.seed(123)
+boot_alt <- wild.boot(svar_alt, design = "recursive", distr = "rademacher",
+                      n.ahead = 24, nboot = 1000, nc = 1)
+plot(boot_alt, lowerq = 0.025, upperq = 0.975)
 
-# Shock: IP
-irf_alt_IP_IP   <- irf(svar_alt, impulse = "IP",  response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
-irf_alt_IP_CPI  <- irf(svar_alt, impulse = "IP",  response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
-irf_alt_IP_FED  <- irf(svar_alt, impulse = "IP",  response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
 
-# Shock: CPI
-irf_alt_CPI_IP  <- irf(svar_alt, impulse = "CPI", response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
-irf_alt_CPI_CPI <- irf(svar_alt, impulse = "CPI", response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
-irf_alt_CPI_FED <- irf(svar_alt, impulse = "CPI", response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
+svar_base <- id.chol(var13_base, order_k = c("IP", "CPI", "FED"))
+svar_base$B
 
-# Shock: FED
-irf_alt_FED_IP  <- irf(svar_alt, impulse = "FED", response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
-irf_alt_FED_CPI <- irf(svar_alt, impulse = "FED", response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
-irf_alt_FED_FED <- irf(svar_alt, impulse = "FED", response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
+set.seed(123)
+boot_base <- wild.boot(svar_base, design = "recursive", distr = "rademacher",
+                       n.ahead = 24, nboot = 1000, nc = 1)
+plot(boot_base, lowerq = 0.025, upperq = 0.975)
 
-plot(irf_alt_IP_IP);   plot(irf_alt_IP_CPI);   plot(irf_alt_IP_FED)
-plot(irf_alt_CPI_IP);  plot(irf_alt_CPI_CPI);  plot(irf_alt_CPI_FED)
-plot(irf_alt_FED_IP);  plot(irf_alt_FED_CPI);  plot(irf_alt_FED_FED)
 
+svar_base$B
+svar_alt$B
