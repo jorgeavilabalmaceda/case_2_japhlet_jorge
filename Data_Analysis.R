@@ -1,3 +1,4 @@
+install.packages("svars")
 library("tseries")
 library(vars)
 library(bootUR)
@@ -747,6 +748,32 @@ plot(irf_IP_IP_level,   main = "IP → IP")
 plot(irf_IP_CPI_level,  main = "IP → CPI")
 plot(irf_IP_FED_level,  main = "IP → FED")
 
+# SVAR ordering: INDPRO -> CPI -> FED
+var_data_svar <- data.frame(
+  IP = IP_dlog,
+  CPI = CPI_dlog,
+  FED = FED_d
+)
+
+# Same lag length as reduced-form VAR
+var13_svar <- VAR(var_data_svar, p = 13, type = "const")
+
+# Recursive SVAR using Cholesky identification
+library(svars)
+
+svar_chol <- id.chol(var13_svar)
+
+summary(svar_chol)
+
+
+irf_svar <- irf(
+  svar_chol,
+  n.ahead = 24,
+  boot = TRUE,
+  runs = 1000
+)
+
+plot(irf_svar)
 
 
 
