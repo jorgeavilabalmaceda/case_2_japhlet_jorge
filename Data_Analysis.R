@@ -755,29 +755,82 @@ var_data_svar <- data.frame(
   FED = FED_d
 )
 
-# Same lag length as reduced-form VAR
-var13_svar <- VAR(var_data_svar, p = 13, type = "const")
+# Baseline ordering: IP -> CPI -> FED
+var13_base <- VAR(var_data_svar, p = 13, type = "const")
+# ============================================================
+# Recursive SVAR (Cholesky identification) with vars
+# ============================================================
 
-# Recursive SVAR using Cholesky identification
-library(svars)
+# B-model: u_t = B e_t, with B lower triangular
+# NA = estimated freely, 0 = restricted to zero
+# 6 free parameters = 6 distinct elements of Sigma_u -> just-identified
+Bmat <- diag(3)
+Bmat[lower.tri(Bmat, diag = TRUE)] <- NA
+Bmat
 
-svar_chol <- id.chol(var13_svar)
+# ------------------------------------------------------------
+# 1. Baseline ordering: IP -> CPI -> FED (Bernanke et al., 2005)
+# ------------------------------------------------------------
 
-summary(svar_chol)
+# Uses the reduced-form VAR(13) estimated earlier
+svar_base <- SVAR(var13_base, estmethod = "direct", Bmat = Bmat)
+svar_base$B          # impact matrix (= Cholesky factor of Sigma_u)
 
+set.seed(123)
 
-irf_svar <- irf(
-  svar_chol,
-  n.ahead = 24,
-  boot = TRUE,
-  runs = 1000
+# Shock: IP
+irf_base_IP_IP   <- irf(svar_base, impulse = "IP",  response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
+irf_base_IP_CPI  <- irf(svar_base, impulse = "IP",  response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
+irf_base_IP_FED  <- irf(svar_base, impulse = "IP",  response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
+
+# Shock: CPI
+irf_base_CPI_IP  <- irf(svar_base, impulse = "CPI", response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
+irf_base_CPI_CPI <- irf(svar_base, impulse = "CPI", response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
+irf_base_CPI_FED <- irf(svar_base, impulse = "CPI", response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
+
+# Shock: FED
+irf_base_FED_IP  <- irf(svar_base, impulse = "FED", response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
+irf_base_FED_CPI <- irf(svar_base, impulse = "FED", response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
+irf_base_FED_FED <- irf(svar_base, impulse = "FED", response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
+
+plot(irf_base_IP_IP);   plot(irf_base_IP_CPI);   plot(irf_base_IP_FED)
+plot(irf_base_CPI_IP);  plot(irf_base_CPI_CPI);  plot(irf_base_CPI_FED)
+plot(irf_base_FED_IP);  plot(irf_base_FED_CPI);  plot(irf_base_FED_FED)
+
+# ------------------------------------------------------------
+# 2. Alternative ordering: FED -> IP -> CPI
+# ------------------------------------------------------------
+
+var_data_alt <- data.frame(
+  FED = FED_d,
+  IP  = IP_dlog,
+  CPI = CPI_dlog
 )
 
-plot(irf_svar)
+# Same lag length and deterministic terms as the baseline
+var13_alt <- VAR(var_data_alt, p = 13, type = "const")
 
+svar_alt <- SVAR(var13_alt, estmethod = "direct", Bmat = Bmat)
+svar_alt$B
 
+set.seed(123)
 
+# Shock: IP
+irf_alt_IP_IP   <- irf(svar_alt, impulse = "IP",  response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
+irf_alt_IP_CPI  <- irf(svar_alt, impulse = "IP",  response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
+irf_alt_IP_FED  <- irf(svar_alt, impulse = "IP",  response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
 
+# Shock: CPI
+irf_alt_CPI_IP  <- irf(svar_alt, impulse = "CPI", response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
+irf_alt_CPI_CPI <- irf(svar_alt, impulse = "CPI", response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
+irf_alt_CPI_FED <- irf(svar_alt, impulse = "CPI", response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
 
+# Shock: FED
+irf_alt_FED_IP  <- irf(svar_alt, impulse = "FED", response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
+irf_alt_FED_CPI <- irf(svar_alt, impulse = "FED", response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
+irf_alt_FED_FED <- irf(svar_alt, impulse = "FED", response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
 
+plot(irf_alt_IP_IP);   plot(irf_alt_IP_CPI);   plot(irf_alt_IP_FED)
+plot(irf_alt_CPI_IP);  plot(irf_alt_CPI_CPI);  plot(irf_alt_CPI_FED)
+plot(irf_alt_FED_IP);  plot(irf_alt_FED_CPI);  plot(irf_alt_FED_FED)
 
