@@ -1014,5 +1014,73 @@ grid::grid.text(
 
 
 
+#Our local projections did not solve the identification problem, we will now move onto structural IRFs via local projections and see the results.
+#Since we already have an imposed order due to the SVAR's implementation we will use recursive restrictions to estimate these local projections and then compare them to our results on our VARs, essentially changing estimation method.
+
+colnames(var_data)
+
+lp_structural <- lp_lin(
+  endog_data     = var_data,
+  
+  # Same lag order as VAR
+  lags_endog_lin = 13,
+  
+  # Constant, no deterministic trend
+  trend          = 0,
+  
+  # Unit structural shock
+  shock_type     = 1,
+  
+  # 95% confidence intervals
+  confint        = 1.96,
+  
+  # Newey-West standard errors
+  use_nw         = TRUE,
+  nw_lag         = NULL,
+  nw_prewhite    = FALSE,
+  adjust_se      = TRUE,
+  
+  # Gives horizons h = 0,...,24
+  hor            = 24
+)
+
+plot(lp_structural)
+
+grid::grid.text(
+  "Structural LP: IP → CPI → FED",
+  x = 0.2, y = 0.98,
+  just = c("left", "top"),
+  gp = grid::gpar(fontsize = 16, fontface = "bold")
+)
+
+
+lp_structural$irf_lin_mean[, 1, 1]
+lp_structural$irf_lin_mean[, 1, 2]
+lp_structural$irf_lin_mean[, 1, 3]
+
+
+# ============================================================
+# Significance of structural LP: FED -> CPI
+# ============================================================
+
+struct_FED_CPI <- data.frame(
+  horizon = 0:24,
+  estimate = as.numeric(lp_structural$irf_lin_mean[2, , 3]),
+  lower    = as.numeric(lp_structural$irf_lin_low[2, , 3]),
+  upper    = as.numeric(lp_structural$irf_lin_up[2, , 3])
+)
+
+struct_FED_CPI
+
+struct_FED_CPI$significant <-
+  (struct_FED_CPI$lower > 0) |
+  (struct_FED_CPI$upper < 0)
+
+struct_FED_CPI
+
+struct_FED_CPI[
+  struct_FED_CPI$significant,
+]
+
 
 
