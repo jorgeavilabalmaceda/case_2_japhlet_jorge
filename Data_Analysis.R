@@ -1007,15 +1007,12 @@ grid::grid.text(
   gp = grid::gpar(fontsize = 16, fontface = "bold")
 )
 
-#due to ordering we have always from top to bottom IP, CPI, FED so
+#IP->FED early positive response with statistically significant bands, consistent with granger causality conclusion that IP contains predictive information for the FED process
+#CPI->other variables were noisey and statistically insignificant, in line with earlier predictive relationships claiming weak effect of CPI onto FED
+#FED->IP seems to be statistically insignificant over all, slightly positive and then negative
+#FED->CPI still doesn't resolve price puzzle
 
-# IP shock: responses of IP, CPI, FED
-#plot(lp_IP)
 
-# CPI shock: responses of IP, CPI, FED
-#plot(lp_CPI)
 
-# FED shock: responses of IP, CPI, FED
-#plot(lp_FED)
 
 
