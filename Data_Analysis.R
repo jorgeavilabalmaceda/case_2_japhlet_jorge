@@ -546,7 +546,7 @@ print(bg_var2_4)
 
 
 
-#CHECKING ACF for potential lags that were missed
+#Checking ACF for potential lags that were missed
 
 acf(residuals(var15)[, "IP"],lag.max = 24)
 pacf(residuals(var15)[, "IP"],lag.max = 24)
@@ -768,9 +768,9 @@ Bmat <- diag(3)
 Bmat[lower.tri(Bmat, diag = TRUE)] <- NA
 Bmat
 
-# ------------------------------------------------------------
+
 # 1. Baseline ordering: IP -> CPI -> FED (Bernanke et al., 2005)
-# ------------------------------------------------------------
+
 
 # Uses the reduced-form VAR(13) estimated earlier
 svar_base <- SVAR(var13_base, estmethod = "direct", Bmat = Bmat)
@@ -797,9 +797,9 @@ plot(irf_base_IP_IP);   plot(irf_base_IP_CPI);   plot(irf_base_IP_FED)
 plot(irf_base_CPI_IP);  plot(irf_base_CPI_CPI);  plot(irf_base_CPI_FED)
 plot(irf_base_FED_IP);  plot(irf_base_FED_CPI);  plot(irf_base_FED_FED)
 
-# ------------------------------------------------------------
+
 # 2. Alternative ordering: FED -> IP -> CPI
-# ------------------------------------------------------------
+
 
 var_data_alt <- data.frame(
   FED = FED_d,
@@ -829,3 +829,227 @@ plot(boot_base, lowerq = 0.025, upperq = 0.975)
 
 svar_base$B
 svar_alt$B
+
+
+
+
+#=======================
+#local projections, first compare vars vs local projections, then we move onto structural vars through LPs
+#=======================
+
+install.packages("lpirfs")
+library(lpirfs)
+args(lp_lin_iv)
+?lp_lin_iv
+
+#Z_t= A_1 Z_t-1 +...+ A_13 Z_t-13 + u_t
+
+#reduced form innovations from our VAR(13)
+u_hat <- as.data.frame(residuals(var13))
+
+head(u_hat)
+colnames(u_hat)
+dim(u_hat)
+
+u_hat$FED
+
+#align data
+
+p <- 13
+
+lp_data <- var_data[(p + 1):nrow(var_data), ]
+
+#two numbers are identical: nice
+nrow(lp_data)
+nrow(u_hat)
+
+#fed reduced form innovation
+FED_shock <- data.frame(
+  FED_shock = u_hat$FED
+)
+#reduced form innovations may contemporaneously correlated
+FED_contemp <- data.frame(
+  IP_innovation  = u_hat$IP,
+  CPI_innovation = u_hat$CPI
+)
+
+#we should compare these to: irf(var13, impulse = "FED", ..., ortho = FALSE)
+
+#estimate FED local porjections:
+
+lp_FED <- lp_lin_iv(
+  endog_data     = lp_data,
+  shock          = FED_shock,
+  contemp_data   = FED_contemp,
+  
+  # same lag order as VAR
+  lags_endog_lin = 13,
+  
+  # constant but no time trend
+  trend          = 0,
+  
+  # 95% confidence interval
+  confint        = 1.96,
+  
+  # Newey-West standard errors
+  use_nw         = TRUE,
+  nw_lag         = NULL,
+  nw_prewhite    = FALSE,
+  adjust_se      = TRUE,
+  
+  # lpirfs interprets hor = H as horizons 0,...,H-1
+  # Therefore 25 gives us h = 0,...,24
+  hor            = 25
+)
+
+#plot(lp_FED)
+names(lp_FED)
+
+#check
+#lp_FED$irf_lin_mean
+
+# Extract FED -> CPI Local Projection
+
+rownames(lp_FED$irf_lin_mean) <- c("IP", "CPI", "FED")
+rownames(lp_FED$irf_lin_low)  <- c("IP", "CPI", "FED")
+rownames(lp_FED$irf_lin_up)   <- c("IP", "CPI", "FED")
+
+lp_FED_CPI <- data.frame(
+  horizon  = 0:24,
+  estimate = as.numeric(lp_FED$irf_lin_mean["CPI", ]),
+  lower    = as.numeric(lp_FED$irf_lin_low["CPI", ]),
+  upper    = as.numeric(lp_FED$irf_lin_up["CPI", ])
+)
+
+lp_FED_CPI
+
+
+lp_FED_CPI$significant <-
+  (lp_FED_CPI$lower > 0) |
+  (lp_FED_CPI$upper < 0)
+
+lp_FED_CPI[
+  lp_FED_CPI$significant,
+]
+#all statistically significant horizons are positive -> local projections don't solve price puzzle
+
+#===========================================================
+# CPI SHOCK
+#============================================================
+
+CPI_shock <- data.frame(
+  CPI_shock = u_hat$CPI
+)
+
+CPI_contemp <- data.frame(
+  IP_innovation  = u_hat$IP,
+  FED_innovation = u_hat$FED
+)
+
+lp_CPI <- lp_lin_iv(
+  endog_data     = lp_data,
+  shock          = CPI_shock,
+  contemp_data   = CPI_contemp,
+  
+  lags_endog_lin = 13,
+  trend          = 0,
+  
+  confint        = 1.96,
+  
+  use_nw         = TRUE,
+  nw_lag         = NULL,
+  nw_prewhite    = FALSE,
+  adjust_se      = TRUE,
+  
+  hor            = 25
+)
+
+#plot(lp_CPI)
+
+rownames(lp_CPI$irf_lin_mean) <- c("IP", "CPI", "FED")
+rownames(lp_CPI$irf_lin_low)  <- c("IP", "CPI", "FED")
+rownames(lp_CPI$irf_lin_up)   <- c("IP", "CPI", "FED")
+
+colnames(lp_CPI$irf_lin_mean) <- 0:24
+colnames(lp_CPI$irf_lin_low)  <- 0:24
+colnames(lp_CPI$irf_lin_up)   <- 0:24
+
+
+
+#============================================================
+#IP SHOCK
+#============================================================
+
+IP_shock <- data.frame(
+  IP_shock = u_hat$IP
+)
+
+IP_contemp <- data.frame(
+  CPI_innovation = u_hat$CPI,
+  FED_innovation = u_hat$FED
+)
+
+lp_IP <- lp_lin_iv(
+  endog_data     = lp_data,
+  shock          = IP_shock,
+  contemp_data   = IP_contemp,
+  
+  lags_endog_lin = 13,
+  trend          = 0,
+  
+  confint        = 1.96,
+  
+  use_nw         = TRUE,
+  nw_lag         = NULL,
+  nw_prewhite    = FALSE,
+  adjust_se      = TRUE,
+  
+  hor            = 25
+)
+
+#plot(lp_IP)
+
+rownames(lp_IP$irf_lin_mean) <- c("IP", "CPI", "FED")
+rownames(lp_IP$irf_lin_low)  <- c("IP", "CPI", "FED")
+rownames(lp_IP$irf_lin_up)   <- c("IP", "CPI", "FED")
+
+colnames(lp_IP$irf_lin_mean) <- 0:24
+colnames(lp_IP$irf_lin_low)  <- 0:24
+colnames(lp_IP$irf_lin_up)   <- 0:24
+
+plot(lp_IP)
+grid::grid.text(
+  "IP Shock",
+  x = 0.2, y = 0.98,
+  just = c("left", "top"),
+  gp = grid::gpar(fontsize = 16, fontface = "bold")
+)
+
+plot(lp_CPI)
+grid::grid.text(
+  "CPI Shock",
+  x = 0.2, y = 0.98,
+  just = c("left", "top"),
+  gp = grid::gpar(fontsize = 16, fontface = "bold")
+)
+
+plot(lp_FED)
+grid::grid.text(
+  "FED Shock",
+  x = 0.2, y = 0.98,
+  just = c("left", "top"),
+  gp = grid::gpar(fontsize = 16, fontface = "bold")
+)
+
+#due to ordering we have always from top to bottom IP, CPI, FED so
+
+# IP shock: responses of IP, CPI, FED
+#plot(lp_IP)
+
+# CPI shock: responses of IP, CPI, FED
+#plot(lp_CPI)
+
+# FED shock: responses of IP, CPI, FED
+#plot(lp_FED)
+
+
