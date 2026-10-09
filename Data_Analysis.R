@@ -1083,4 +1083,159 @@ struct_FED_CPI[
 ]
 
 
+# ============================================================
+# SHOCK PROXIES 
+# Needs from the main script: data, var_data (IP, CPI, FED)
+# ============================================================
 
+library(readxl)    # read the USMPD Excel file
+library(sandwich)  # robust standard errors
+library(lmtest)    # coeftest()
+library(vars)      # VAR, irf, causality
+library(lpirfs)    # local projections
+
+set.seed(123)
+p <- 13   # same lag length as our VAR(13)
+H <- 24   # horizons 0,...,24 months
+
+# ------------------------------------------------------------
+# STEP 1. Load the USMPD and make one surprise per month
+# ------------------------------------------------------------
+usmpd <- read_excel("USMPD.xlsx", sheet = "Monetary Events")
+
+# The Date column is read wrongly (2064 instead of 1994).
+# date_time is an Excel day number, so we convert that instead.
+usmpd$Date <- as.Date(floor(usmpd$date_time), origin = "1899-12-30")
+
+# Keep FF4 (= surprise in expected fed funds rate ~3 months ahead)
+usmpd <- usmpd[!is.na(usmpd$FF4), ]
+
+# Set every date to the 1st of its month, like the FRED data
+usmpd$month <- as.Date(format(usmpd$Date, "%Y-%m-01"))
+
+# Add up the surprises within each month
+z_month <- aggregate(FF4 ~ month, data = usmpd, FUN = sum)
+names(z_month) <- c("month", "z")
+
+# ------------------------------------------------------------
+# STEP 2. Put the proxy next to our VAR data
+# ------------------------------------------------------------
+# var_data starts one month later than data (we lost 1 obs by differencing)
+pv <- data.frame(month = data$sasdate[-1], var_data)
+pv <- merge(pv, z_month, by = "month", all.x = TRUE)
+
+# Only keep the months covered by the USMPD (from Feb 1994)
+pv <- pv[pv$month >= min(z_month$month), ]
+
+# Months without an FOMC meeting have no surprise -> 0
+pv$z[is.na(pv$z)] <- 0
+
+range(pv$month)   # should be 1994-02-01 to 2019-12-01
+plot(pv$month, pv$z, type = "h", main = "Monthly FF4 surprise", xlab = "", ylab = "z")
+
+# ------------------------------------------------------------
+# STEP 3. Is the proxy any good? Three checks
+# ------------------------------------------------------------
+
+# (a) RELEVANCE: does the surprise move the fed funds rate?
+var_fs <- VAR(pv[, c("IP", "CPI", "FED")], p = p, type = "const",
+              exogen = pv[, "z", drop = FALSE])
+fed_eq <- lm(y ~ . - 1, data = var_fs$varresult$FED$model)
+first_stage <- coeftest(fed_eq, vcov = vcovHC(fed_eq, type = "HC1"))["z", ]
+first_stage
+first_stage["t value"]^2   # first-stage F: should be above 10
+
+# (b) EXOGENEITY: can past IP, CPI, FED predict the surprise?
+var_ii <- VAR(pv[, c("z", "IP", "CPI", "FED")], p = p, type = "const")
+causality(var_ii, cause = c("IP", "CPI", "FED"))$Granger
+
+# (c) INFORMATION EFFECT: how often do rates and stocks move the same way?
+ev <- usmpd[usmpd$FF4 != 0 & !is.na(usmpd$SP500), ]
+mean(sign(ev$FF4) == sign(ev$SP500))
+
+# ------------------------------------------------------------
+# Helper: scale an IRF so FED rises by 0.25 on impact,
+# and turn IP and CPI from log points into percent
+# ------------------------------------------------------------
+normalise <- function(ir, shock) {
+  scale <- 0.25 / ir$irf[[shock]][1, "FED"]
+  est <- ir$irf[[shock]]   * scale
+  lo  <- ir$Lower[[shock]] * scale
+  hi  <- ir$Upper[[shock]] * scale
+  out <- list(est = est, lo = pmin(lo, hi), hi = pmax(lo, hi))
+  for (k in names(out)) {
+    out[[k]] <- out[[k]][, c("IP", "CPI", "FED")]
+    out[[k]][, c("IP", "CPI")] <- 100 * out[[k]][, c("IP", "CPI")]
+  }
+  out
+}
+
+# ------------------------------------------------------------
+# STEP 4. Old method on the same years: recursive VAR (IP -> CPI -> FED)
+#         cumulative = TRUE gives responses in levels
+# ------------------------------------------------------------
+var_rec <- VAR(pv[, c("IP", "CPI", "FED")], p = p, type = "const")
+irf_rec <- irf(var_rec, impulse = "FED", ortho = TRUE, cumulative = TRUE,
+               n.ahead = H, boot = TRUE, runs = 1000)
+rec <- normalise(irf_rec, "FED")
+
+# ------------------------------------------------------------
+# STEP 5. New method 1: internal instrument
+#         Put z FIRST in the recursive VAR (Plagborg-Moller & Wolf 2021)
+# ------------------------------------------------------------
+irf_ii <- irf(var_ii, impulse = "z", response = c("IP", "CPI", "FED"),
+              ortho = TRUE, cumulative = TRUE,
+              n.ahead = H, boot = TRUE, runs = 1000)
+ii <- normalise(irf_ii, "z")
+
+# ------------------------------------------------------------
+# STEP 6. New method 2: LP-IV (Stock & Watson 2018)
+#         Variables in levels; FED is instrumented by z
+# ------------------------------------------------------------
+lv <- data.frame(month = data$sasdate,
+                 IP  = 100 * log(data$INDPRO),
+                 CPI = 100 * log(data$CPIAUCSL),
+                 FED = data$FEDFUNDS)
+lv <- merge(lv, pv[, c("month", "z")], by = "month")   # same months as pv
+
+lp_iv <- lp_lin_iv(
+  endog_data     = lv[, c("IP", "CPI", "FED")],
+  shock          = lv[, "FED", drop = FALSE],   # variable we shock
+  instrum        = lv[, "z",   drop = FALSE],   # the proxy
+  use_twosls     = TRUE,                        # 2SLS: FED instrumented by z
+  lags_endog_lin = p,
+  trend          = 0,
+  confint        = 1.96,
+  use_nw         = TRUE,
+  hor            = H + 1                        # h = 0,...,24
+)
+
+# lpirfs gives the effect of +1 on FED; we want +0.25
+lp <- list(est = t(lp_iv$irf_lin_mean) * 0.25,
+           lo  = t(lp_iv$irf_lin_low)  * 0.25,
+           hi  = t(lp_iv$irf_lin_up)   * 0.25)
+for (k in names(lp)) colnames(lp[[k]]) <- c("IP", "CPI", "FED")
+
+# ------------------------------------------------------------
+# STEP 7. Compare the three methods in one figure
+#   black = recursive, blue = internal instrument, red = LP-IV
+# ------------------------------------------------------------
+h <- 0:H
+par(mfrow = c(1, 3))
+for (v in c("IP", "CPI", "FED")) {
+  ylim <- range(rec$lo[, v], rec$hi[, v], ii$lo[, v], ii$hi[, v], lp$lo[, v], lp$hi[, v])
+  plot(h, rec$est[, v], type = "l", lwd = 2, ylim = ylim,
+       main = paste("Response of", v), xlab = "Months", ylab = "")
+  lines(h, rec$lo[, v], lty = 2); lines(h, rec$hi[, v], lty = 2)
+  lines(h, ii$est[, v], col = "blue", lwd = 2)
+  lines(h, ii$lo[, v],  col = "blue", lty = 2); lines(h, ii$hi[, v], col = "blue", lty = 2)
+  lines(h, lp$est[, v], col = "red", lwd = 2)
+  lines(h, lp$lo[, v],  col = "red", lty = 2);  lines(h, lp$hi[, v], col = "red", lty = 2)
+  abline(h = 0, col = "grey")
+}
+legend("bottomleft", c("Recursive", "Internal instrument", "LP-IV"),
+       col = c("black", "blue", "red"), lwd = 2, bty = "n")
+
+# Price response at 0, 6, 12, 18, 24 months (in %)
+round(cbind(month = h, recursive = rec$est[, "CPI"],
+            internal = ii$est[, "CPI"], lp_iv = lp$est[, "CPI"])[c(1, 7, 13, 19, 25), ], 3)
