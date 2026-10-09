@@ -1,4 +1,4 @@
-install.packages("svars")
+library(svars)
 library("tseries")
 library(vars)
 library(bootUR)
@@ -748,84 +748,51 @@ plot(irf_IP_IP_level,   main = "IP → IP")
 plot(irf_IP_CPI_level,  main = "IP → CPI")
 plot(irf_IP_FED_level,  main = "IP → FED")
 
-# SVAR ordering: INDPRO -> CPI -> FED
-var_data_svar <- data.frame(
-  IP = IP_dlog,
-  CPI = CPI_dlog,
-  FED = FED_d
-)
 
-# Baseline ordering: IP -> CPI -> FED
-var13_base <- VAR(var_data_svar, p = 13, type = "const")
-# ============================================================
-# Recursive SVAR (Cholesky identification) with vars
-# ============================================================
-
-# B-model: u_t = B e_t, with B lower triangular
-# NA = estimated freely, 0 = restricted to zero
-# 6 free parameters = 6 distinct elements of Sigma_u -> just-identified
+# ------------------------------------------------------------
+# 1. Baseline with vars: B-model u_t = B e_t, B lower triangular
+#    NA = estimated, 0 = restricted. 6 free parameters = 6 distinct
+#    elements of Sigma_u, so the model is just identified.
+# ------------------------------------------------------------
 Bmat <- diag(3)
 Bmat[lower.tri(Bmat, diag = TRUE)] <- NA
 Bmat
 
-# ------------------------------------------------------------
-# 1. Baseline ordering: IP -> CPI -> FED (Bernanke et al., 2005)
-# ------------------------------------------------------------
+svar_vars <- SVAR(var13, estmethod = "direct", Bmat = Bmat)
+svar_vars$B                      # impact matrix (= Cholesky factor of Sigma_u)
 
-# Uses the reduced-form VAR(13) estimated earlier
-svar_base <- SVAR(var13_base, estmethod = "direct", Bmat = Bmat)
-svar_base$B          # impact matrix (= Cholesky factor of Sigma_u)
-
+# All impulse responses in one call (every shock on every variable)
 set.seed(123)
+irf_vars <- irf(svar_vars, n.ahead = 24, boot = TRUE, runs = 1000)
+plot(irf_vars)
 
-# Shock: IP
-irf_base_IP_IP   <- irf(svar_base, impulse = "IP",  response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
-irf_base_IP_CPI  <- irf(svar_base, impulse = "IP",  response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
-irf_base_IP_FED  <- irf(svar_base, impulse = "IP",  response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
-
-# Shock: CPI
-irf_base_CPI_IP  <- irf(svar_base, impulse = "CPI", response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
-irf_base_CPI_CPI <- irf(svar_base, impulse = "CPI", response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
-irf_base_CPI_FED <- irf(svar_base, impulse = "CPI", response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
-
-# Shock: FED
-irf_base_FED_IP  <- irf(svar_base, impulse = "FED", response = "IP",  n.ahead = 24, boot = TRUE, runs = 1000)
-irf_base_FED_CPI <- irf(svar_base, impulse = "FED", response = "CPI", n.ahead = 24, boot = TRUE, runs = 1000)
-irf_base_FED_FED <- irf(svar_base, impulse = "FED", response = "FED", n.ahead = 24, boot = TRUE, runs = 1000)
-
-plot(irf_base_IP_IP);   plot(irf_base_IP_CPI);   plot(irf_base_IP_FED)
-plot(irf_base_CPI_IP);  plot(irf_base_CPI_CPI);  plot(irf_base_CPI_FED)
-plot(irf_base_FED_IP);  plot(irf_base_FED_CPI);  plot(irf_base_FED_FED)
 
 # ------------------------------------------------------------
-# 2. Alternative ordering: FED -> IP -> CPI
+# 2. Both orderings with svars (same method, so comparable)
 # ------------------------------------------------------------
 
-var_data_alt <- data.frame(
-  FED = FED_d,
-  IP  = IP_dlog,
-  CPI = CPI_dlog
-)
+# Baseline: IP -> CPI -> FED (Fed reacts to IP and CPI within the month)
+svar_base <- id.chol(var13, order_k = c("IP", "CPI", "FED"))
 
-library(svars)
+# Alternative: FED -> IP -> CPI (IP and CPI react to the Fed within the month)
+svar_alt  <- id.chol(var13, order_k = c("FED", "IP", "CPI"))
 
-svar_alt <- id.chol(var13_base, order_k = c("FED", "IP", "CPI"))
-svar_alt$B
-
-set.seed(123)
-boot_alt <- wild.boot(svar_alt, design = "recursive", distr = "rademacher",
-                      n.ahead = 24, nboot = 1000, nc = 1)
-plot(boot_alt, lowerq = 0.025, upperq = 0.975)
-
-
-svar_base <- id.chol(var13_base, order_k = c("IP", "CPI", "FED"))
-svar_base$B
-
+# Wild bootstrap for the impulse responses, 95% bands
 set.seed(123)
 boot_base <- wild.boot(svar_base, design = "recursive", distr = "rademacher",
                        n.ahead = 24, nboot = 1000, nc = 1)
+set.seed(123)
+boot_alt  <- wild.boot(svar_alt,  design = "recursive", distr = "rademacher",
+                       n.ahead = 24, nboot = 1000, nc = 1)
+
 plot(boot_base, lowerq = 0.025, upperq = 0.975)
+plot(boot_alt,  lowerq = 0.025, upperq = 0.975)
 
 
+# ------------------------------------------------------------
+# 3. Compare the impact matrices of the two orderings
+# ------------------------------------------------------------
 svar_base$B
 svar_alt$B
+
+t(chol(summary(var13)$covres))
