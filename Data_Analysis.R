@@ -749,11 +749,10 @@ plot(irf_IP_CPI_level,  main = "IP → CPI")
 plot(irf_IP_FED_level,  main = "IP → FED")
 
 
-# ------------------------------------------------------------
 # 1. Baseline with vars: B-model u_t = B e_t, B lower triangular
 #    NA = estimated, 0 = restricted. 6 free parameters = 6 distinct
 #    elements of Sigma_u, so the model is just identified.
-# ------------------------------------------------------------
+
 Bmat <- diag(3)
 Bmat[lower.tri(Bmat, diag = TRUE)] <- NA
 Bmat
@@ -784,18 +783,15 @@ plot(boot_base, lowerq = 0.025, upperq = 0.975)
 plot(boot_alt,  lowerq = 0.025, upperq = 0.975)
 
 
-# ------------------------------------------------------------
-# 3. Compare the impact matrices of the two orderings
-# ------------------------------------------------------------
+
+# Compare the impact matrices of the two orderings
+
 svar_base$B
 svar_alt$B
 
-# ------------------------------------------------------------
-# TASK 7: RECURSIVE SVAR INFRASTRUCTURE VIA STANDARD IRF
-# ------------------------------------------------------------
 
-# --- MODEL 1: BASELINE ORDERING (IP -> CPI -> FED) ---
-# Fed reacts to IP and CPI within the month (Bernanke et al., 2005)
+
+
 var_base <- VAR(var_data[, c("IP", "CPI", "FED")], p = p, type = "const")
 
 set.seed(123)
@@ -808,7 +804,7 @@ irf_base <- irf(var_base,
                 boot = TRUE,                             # Standard homoskedastic residual bootstrap
                 runs = 1000)
 
-# --- MODEL 2: ALTERNATIVE ORDERING (FED -> IP -> CPI) ---
+
 # IP and CPI react to the Fed within the month 
 var_alt  <- VAR(var_data[, c("FED", "IP", "CPI")], p = p, type = "const")
 
@@ -822,17 +818,14 @@ irf_alt  <- irf(var_alt,
                 boot = TRUE,                             # Standard homoskedastic residual bootstrap
                 runs = 1000)
 
-# ------------------------------------------------------------
-# PLOT AND COMPARE THE EMPIRICAL CAUSAL TRAJECTORIES
-# ------------------------------------------------------------
 plot(irf_base)
 plot(irf_alt)
 
 
 
-#=======================
+
 #local projections, first compare vars vs local projections, then we move onto structural vars through LPs
-#=======================
+
 
 install.packages("lpirfs")
 library(lpirfs)
@@ -930,9 +923,9 @@ lp_FED_CPI[
 ]
 #all statistically significant horizons are positive -> local projections don't solve price puzzle
 
-#===========================================================
+
 # CPI SHOCK
-#============================================================
+
 
 CPI_shock <- data.frame(
   CPI_shock = u_hat$CPI
@@ -973,9 +966,9 @@ colnames(lp_CPI$irf_lin_up)   <- 0:24
 
 
 
-#============================================================
+
 #IP SHOCK
-#============================================================
+
 
 IP_shock <- data.frame(
   IP_shock = u_hat$IP
@@ -1090,9 +1083,9 @@ lp_structural$irf_lin_mean[, 1, 2]
 lp_structural$irf_lin_mean[, 1, 3]
 
 
-# ============================================================
+
 # Significance of structural LP: FED -> CPI
-# ============================================================
+
 
 struct_FED_CPI <- data.frame(
   horizon = 0:24,
@@ -1114,10 +1107,9 @@ struct_FED_CPI[
 ]
 
 
-# ============================================================
 # SHOCK PROXIES 
 # Needs from the main script: data, var_data (IP, CPI, FED)
-# ============================================================
+
 
 library(readxl)    # read the USMPD Excel file
 library(sandwich)  # robust standard errors
@@ -1129,9 +1121,7 @@ set.seed(123)
 p <- 13   # same lag length as our VAR(13)
 H <- 24   # horizons 0,...,24 months
 
-# ------------------------------------------------------------
-# STEP 1. Load the USMPD and make one surprise per month
-# ------------------------------------------------------------
+
 usmpd <- read_excel("USMPD.xlsx", sheet = "Monetary Events")
 
 # The Date column is read wrongly (2064 instead of 1994).
@@ -1149,8 +1139,6 @@ z_month <- aggregate(FF4 ~ month, data = usmpd, FUN = sum)
 names(z_month) <- c("month", "z")
 
 # ------------------------------------------------------------
-# STEP 2. Put the proxy next to our VAR data
-# ------------------------------------------------------------
 # var_data starts one month later than data (we lost 1 obs by differencing)
 pv <- data.frame(month = data$sasdate[-1], var_data)
 pv <- merge(pv, z_month, by = "month", all.x = TRUE)
@@ -1164,9 +1152,6 @@ pv$z[is.na(pv$z)] <- 0
 range(pv$month)   # should be 1994-02-01 to 2019-12-01
 plot(pv$month, pv$z, type = "h", main = "Monthly FF4 surprise", xlab = "", ylab = "z")
 
-# ------------------------------------------------------------
-# STEP 3. Is the proxy any good? Three checks
-# ------------------------------------------------------------
 
 # (a) RELEVANCE: does the surprise move the fed funds rate?
 var_fs <- VAR(pv[, c("IP", "CPI", "FED")], p = p, type = "const",
@@ -1181,10 +1166,8 @@ var_ii <- VAR(pv[, c("z", "IP", "CPI", "FED")], p = p, type = "const")
 causality(var_ii, cause = c("IP", "CPI", "FED"))$Granger
 
 
-# ------------------------------------------------------------
 # Helper: scale an IRF so FED rises by 0.25 on impact,
 # and turn IP and CPI from log points into percent
-# ------------------------------------------------------------
 normalise <- function(ir, shock) {
   scale <- 0.25 / ir$irf[[shock]][1, "FED"]
   est <- ir$irf[[shock]]   * scale
@@ -1196,29 +1179,24 @@ normalise <- function(ir, shock) {
   }
   out
 }
-
-# ------------------------------------------------------------
-# STEP 4. Old method on the same years: recursive VAR (IP -> CPI -> FED)
-#         cumulative = TRUE gives responses in levels
-# ------------------------------------------------------------
+# Old method on the same years: recursive VAR (IP -> CPI -> FED)
+#cumulative = TRUE gives responses in levels
 var_rec <- VAR(pv[, c("IP", "CPI", "FED")], p = p, type = "const")
 irf_rec <- irf(var_rec, impulse = "FED", ortho = TRUE, cumulative = TRUE,
                n.ahead = H, boot = TRUE, runs = 1000)
 rec <- normalise(irf_rec, "FED")
 
-# ------------------------------------------------------------
-# STEP 5. New method 1: internal instrument
-#         Put z FIRST in the recursive VAR (Plagborg-Moller & Wolf 2021)
-# ------------------------------------------------------------
+# New method 1: internal instrument
+# Put z FIRST in the recursive VAR (Plagborg-Moller & Wolf 2021)
+
 irf_ii <- irf(var_ii, impulse = "z", response = c("IP", "CPI", "FED"),
               ortho = TRUE, cumulative = TRUE,
               n.ahead = H, boot = TRUE, runs = 1000)
 ii <- normalise(irf_ii, "z")
 
-# ------------------------------------------------------------
-# STEP 6. New method 2: LP-IV (Stock & Watson 2018)
-#         Variables in levels; FED is instrumented by z
-# ------------------------------------------------------------
+
+# New method 2: LP-IV (Stock & Watson 2018)
+# Variables in levels; FED is instrumented by z
 lv <- data.frame(month = data$sasdate,
                  IP  = 100 * log(data$INDPRO),
                  CPI = 100 * log(data$CPIAUCSL),
@@ -1243,10 +1221,7 @@ lp <- list(est = t(lp_iv$irf_lin_mean) * 0.25,
            hi  = t(lp_iv$irf_lin_up)   * 0.25)
 for (k in names(lp)) colnames(lp[[k]]) <- c("IP", "CPI", "FED")
 
-# ------------------------------------------------------------
-# STEP 7. Compare the three methods in one figure
-#   black = recursive, blue = internal instrument, red = LP-IV
-# ------------------------------------------------------------
+
 h <- 0:H
 par(mfrow = c(1, 3))
 for (v in c("IP", "CPI", "FED")) {
