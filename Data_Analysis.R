@@ -209,8 +209,8 @@ plot(data$sasdate[-1], FED_d,
 #VAR model selection using criterion 
 #Setup a dataframe run the VAR model select on 
 var_data <- data.frame(
-  IP = IP_dlog,
-  CPI = CPI_dlog,
+  IP = 100*IP_dlog,
+  CPI = 100* CPI_dlog,
   FED = FED_d
 )
 
@@ -735,7 +735,7 @@ irf_IP_FED_level <- irf(var13, impulse = "IP", response = "FED",
                         runs = 1000, cumulative = TRUE)
 
 
-#this has bugs the cumulative irfs 
+ 
 plot(irf_CPI_IP_level,  main = "CPI → IP")
 plot(irf_CPI_CPI_level, main = "CPI → CPI")
 plot(irf_CPI_FED_level, main = "CPI → FED")
@@ -760,12 +760,6 @@ Bmat
 
 
 # 1. Baseline ordering: IP -> CPI -> FED (Bernanke et al., 2005)
-
-
-# All impulse responses in one call (every shock on every variable)
-set.seed(123)
-irf_vars <- irf(svar_vars, n.ahead = 24, boot = TRUE, runs = 1000)
-plot(irf_vars)
 
 
 
@@ -796,6 +790,43 @@ plot(boot_alt,  lowerq = 0.025, upperq = 0.975)
 svar_base$B
 svar_alt$B
 
+# ------------------------------------------------------------
+# TASK 7: RECURSIVE SVAR INFRASTRUCTURE VIA STANDARD IRF
+# ------------------------------------------------------------
+
+# --- MODEL 1: BASELINE ORDERING (IP -> CPI -> FED) ---
+# Fed reacts to IP and CPI within the month (Bernanke et al., 2005)
+var_base <- VAR(var_data[, c("IP", "CPI", "FED")], p = p, type = "const")
+
+set.seed(123)
+irf_base <- irf(var_base, 
+                impulse = "FED",                         # Shock the policy rate
+                response = c("IP", "CPI", "FED"),        # Track the whole system
+                ortho = TRUE,                            # Enforces lower-triangular Cholesky
+                cumulative = TRUE,                       # Integrates growth rates back to levels (%)
+                n.ahead = H, 
+                boot = TRUE,                             # Standard homoskedastic residual bootstrap
+                runs = 1000)
+
+# --- MODEL 2: ALTERNATIVE ORDERING (FED -> IP -> CPI) ---
+# IP and CPI react to the Fed within the month 
+var_alt  <- VAR(var_data[, c("FED", "IP", "CPI")], p = p, type = "const")
+
+set.seed(123)
+irf_alt  <- irf(var_alt, 
+                impulse = "FED",                         # Shock the policy rate
+                response = c("IP", "CPI", "FED"),        # Track the whole system
+                ortho = TRUE,                            # Enforces lower-triangular Cholesky
+                cumulative = TRUE,                       # Integrates growth rates back to levels (%)
+                n.ahead = H, 
+                boot = TRUE,                             # Standard homoskedastic residual bootstrap
+                runs = 1000)
+
+# ------------------------------------------------------------
+# PLOT AND COMPARE THE EMPIRICAL CAUSAL TRAJECTORIES
+# ------------------------------------------------------------
+plot(irf_base)
+plot(irf_alt)
 
 
 
@@ -1149,9 +1180,6 @@ first_stage["t value"]^2   # first-stage F: should be above 10
 var_ii <- VAR(pv[, c("z", "IP", "CPI", "FED")], p = p, type = "const")
 causality(var_ii, cause = c("IP", "CPI", "FED"))$Granger
 
-# (c) INFORMATION EFFECT: how often do rates and stocks move the same way?
-ev <- usmpd[usmpd$FF4 != 0 & !is.na(usmpd$SP500), ]
-mean(sign(ev$FF4) == sign(ev$SP500))
 
 # ------------------------------------------------------------
 # Helper: scale an IRF so FED rises by 0.25 on impact,
@@ -1165,7 +1193,6 @@ normalise <- function(ir, shock) {
   out <- list(est = est, lo = pmin(lo, hi), hi = pmax(lo, hi))
   for (k in names(out)) {
     out[[k]] <- out[[k]][, c("IP", "CPI", "FED")]
-    out[[k]][, c("IP", "CPI")] <- 100 * out[[k]][, c("IP", "CPI")]
   }
   out
 }
@@ -1239,3 +1266,4 @@ legend("bottomleft", c("Recursive", "Internal instrument", "LP-IV"),
 # Price response at 0, 6, 12, 18, 24 months (in %)
 round(cbind(month = h, recursive = rec$est[, "CPI"],
             internal = ii$est[, "CPI"], lp_iv = lp$est[, "CPI"])[c(1, 7, 13, 19, 25), ], 3)
+
