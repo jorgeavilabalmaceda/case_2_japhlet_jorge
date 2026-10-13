@@ -1128,7 +1128,7 @@ usmpd <- read_excel("USMPD.xlsx", sheet = "Monetary Events")
 # date_time is an Excel day number, so we convert that instead.
 usmpd$Date <- as.Date(floor(usmpd$date_time), origin = "1899-12-30")
 
-# Keep FF4 (= surprise in expected fed funds rate ~3 months ahead)
+#we keep FF4 (= surprise in expected fed funds rate ~3 months ahead)
 usmpd <- usmpd[!is.na(usmpd$FF4), ]
 
 # Set every date to the 1st of its month, like the FRED data
@@ -1195,7 +1195,7 @@ irf_ii <- irf(var_ii, impulse = "z", response = c("IP", "CPI", "FED"),
 ii <- normalise(irf_ii, "z")
 
 
-# New method 2: LP-IV (Stock & Watson 2018)
+# New method 2: LP-IV 
 # Variables in levels; FED is instrumented by z
 lv <- data.frame(month = data$sasdate,
                  IP  = 100 * log(data$INDPRO),
