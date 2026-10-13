@@ -614,7 +614,8 @@ install.packages("car")
 library(car)
 #We run a hypothesis test to see directional granger relationships
 
-# FED -> IP
+#we use a linear hypothesis test to see if the coefficients of the lagged values of one variable are jointly zero in the equation for another variable 
+#to get directional granger causality
 FED_to_IP <- linearHypothesis(
   var13$varresult$IP,
   paste0("FED.l", 1:13, " = 0"),
@@ -667,7 +668,7 @@ CPI_to_FED
 
 
 
-#IRF functions 
+#IRF functions of the reduced-form Var(13) model
 # Shock: CPI
 irf_CPI_IP  <- irf(var13, impulse = "CPI", response = "IP",  n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
 irf_CPI_CPI <- irf(var13, impulse = "CPI", response = "CPI", n.ahead = 24, boot = TRUE, ortho = FALSE, runs = 1000)
@@ -757,14 +758,7 @@ Bmat <- diag(3)
 Bmat[lower.tri(Bmat, diag = TRUE)] <- NA
 Bmat
 
-
-# 1. Baseline ordering: IP -> CPI -> FED (Bernanke et al., 2005)
-
-
-
-# 2. Alternative ordering: FED -> IP -> CPI
-
-
+# using rademacher wild bootstrap to get confidence intervals for the impulse responses
 # Baseline: IP -> CPI -> FED (Fed reacts to IP and CPI within the month)
 svar_base <- id.chol(var13, order_k = c("IP", "CPI", "FED"))
 
@@ -789,37 +783,6 @@ plot(boot_alt,  lowerq = 0.025, upperq = 0.975)
 svar_base$B
 svar_alt$B
 
-
-
-
-var_base <- VAR(var_data[, c("IP", "CPI", "FED")], p = p, type = "const")
-
-set.seed(123)
-irf_base <- irf(var_base, 
-                impulse = "FED",                         # Shock the policy rate
-                response = c("IP", "CPI", "FED"),        # Track the whole system
-                ortho = TRUE,                            # Enforces lower-triangular Cholesky
-                cumulative = TRUE,                       # Integrates growth rates back to levels (%)
-                n.ahead = H, 
-                boot = TRUE,                             # Standard homoskedastic residual bootstrap
-                runs = 1000)
-
-
-# IP and CPI react to the Fed within the month 
-var_alt  <- VAR(var_data[, c("FED", "IP", "CPI")], p = p, type = "const")
-
-set.seed(123)
-irf_alt  <- irf(var_alt, 
-                impulse = "FED",                         # Shock the policy rate
-                response = c("IP", "CPI", "FED"),        # Track the whole system
-                ortho = TRUE,                            # Enforces lower-triangular Cholesky
-                cumulative = TRUE,                       # Integrates growth rates back to levels (%)
-                n.ahead = H, 
-                boot = TRUE,                             # Standard homoskedastic residual bootstrap
-                runs = 1000)
-
-plot(irf_base)
-plot(irf_alt)
 
 
 
